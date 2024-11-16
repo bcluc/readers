@@ -39,7 +39,7 @@ dependencies:
   google_fonts: ^6.1.0
   flutter_svg: ^2.0.8
   bitsdojo_window: ^0.1.5
-  intl: ^0.18.1
+  intl: ^0.19.0
   flutter_localizations:
     sdk: flutter
   dart_date: ^1.2.2
@@ -52,9 +52,9 @@ dependencies:
   open_file: ^3.3.2
   printing: ^5.11.1
   diacritic: ^0.1.4
-  fl_chart: ^0.64.0
-  month_year_picker: ^0.3.0+1
-  syncfusion_flutter_charts: ^23.1.44
+  fl_chart: ^0.69.0
+  month_year_picker: ^0.4.0+1
+  syncfusion_flutter_charts: ^27.2.2
   pie_chart: ^5.4.0
 
 dev_dependencies:
@@ -66,7 +66,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

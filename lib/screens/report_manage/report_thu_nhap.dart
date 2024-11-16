@@ -214,7 +214,7 @@ class _BaoCaoThuNhapState extends State<BaoCaoThuNhap> {
         primaryYAxis:
             NumericAxis(minimum: 0, maximum: maximum, interval: _interval),
         tooltipBehavior: _tooltip,
-        series: <ChartSeries<_ChartData, String>>[
+        series: <CartesianSeries<dynamic, dynamic>>[
           ColumnSeries<_ChartData, String>(
               dataSource: data,
               xValueMapper: (_ChartData data, _) => data.x,

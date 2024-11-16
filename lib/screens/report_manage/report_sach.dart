@@ -222,7 +222,7 @@ class _BaoCaoSachState extends State<BaoCaoSach> {
         titlesData: _buildAxes(),
         barTouchData: BarTouchData(
           enabled: true,
-          touchTooltipData: BarTouchTooltipData(tooltipBgColor: secondaryColor),
+          touchTooltipData: BarTouchTooltipData(),
           touchCallback: (p0, p1) {
             if (p0 is FlTapUpEvent) {
               if (p1 == null) return;

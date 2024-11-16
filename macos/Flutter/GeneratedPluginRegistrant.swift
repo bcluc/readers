@@ -9,7 +9,7 @@ import bitsdojo_window_macos
 import open_file_mac
 import path_provider_foundation
 import printing
-import sqflite
+import sqflite_darwin
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   BitsdojoWindowPlugin.register(with: registry.registrar(forPlugin: "BitsdojoWindowPlugin"))

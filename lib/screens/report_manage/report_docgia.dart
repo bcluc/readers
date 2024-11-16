@@ -146,7 +146,6 @@ class _BaoCaoDocGiaState extends State<BaoCaoDocGia> {
             }
           },
           touchTooltipData: LineTouchTooltipData(
-            tooltipBgColor: secondaryColor,
             tooltipRoundedRadius: 5,
             tooltipBorder:
                 const BorderSide(width: 1, color: Colors.transparent),
