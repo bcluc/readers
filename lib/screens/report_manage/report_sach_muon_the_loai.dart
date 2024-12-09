@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:readers/utils/extension.dart';
 import 'package:readers/models/report_the_loai_muon.dart';
-import 'package:readers/utils/facade/pie_chart_facade.dart';
+import 'package:readers/utils/facade/chart_facade/pie_chart_facade.dart';
 
 class BaoCaoTheLoaiSachMuon extends StatelessWidget {
   const BaoCaoTheLoaiSachMuon(

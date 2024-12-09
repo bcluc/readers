@@ -3,7 +3,7 @@ import 'package:readers/main.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:readers/models/report_doc_gia.dart';
 import 'package:readers/screens/report_manage/report_docgia_chitiet.dart';
-import 'package:readers/utils/facade/line_chart_facade.dart';
+import 'package:readers/utils/facade/chart_facade/line_chart_facade.dart';
 
 class BaoCaoDocGia extends StatefulWidget {
   const BaoCaoDocGia({required this.selectedYear, super.key});

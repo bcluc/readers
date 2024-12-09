@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:readers/utils/facade/chart_axis_facade.dart';
+import 'package:readers/utils/facade/chart_facade/chart_axis_facade.dart';
 
 class LineChartFacade {
   final List<int> countDocGia;

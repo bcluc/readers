@@ -6,8 +6,8 @@ import 'package:readers/models/report_sach.dart';
 import 'package:readers/models/report_the_loai_muon.dart';
 import 'package:readers/screens/report_manage/report_sach_chitiet.dart';
 import 'package:readers/screens/report_manage/report_sach_muon_the_loai.dart';
-import 'package:readers/utils/facade/bar_chart_facade.dart';
-import 'package:readers/utils/facade/chart_axis_facade.dart';
+import 'package:readers/utils/facade/chart_facade/bar_chart_facade.dart';
+import 'package:readers/utils/facade/chart_facade/chart_axis_facade.dart';
 
 class BaoCaoSach extends StatefulWidget {
   const BaoCaoSach({required this.selectedYear, super.key});

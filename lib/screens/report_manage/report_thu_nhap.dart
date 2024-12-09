@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:readers/main.dart';
-import 'package:readers/utils/facade/line_column_facade.dart';
+import 'package:readers/utils/facade/chart_facade/line_column_facade.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:readers/models/report_thu_nhap.dart';
 
