@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:readers/main.dart';
+import 'package:readers/utils/facade/chart_facade/line_column_facade.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:readers/models/report_thu_nhap.dart';
 
@@ -100,6 +101,18 @@ class _BaoCaoThuNhapState extends State<BaoCaoThuNhap> {
             child: CircularProgressIndicator(),
           );
         }
+
+        data = getData();
+
+        final chartFacade = LineColumnChartFacade(
+          data: data,
+          primaryXAxisTitle: "Tháng",
+          interval: _interval,
+          maximum: _highestNum.toDouble(),
+          columnColor: mainColor,
+          lineColor: secondaryColor,
+        );
+
         return Padding(
           padding: const EdgeInsets.fromLTRB(50, 10, 70, 60),
           child: Column(
@@ -166,7 +179,7 @@ class _BaoCaoThuNhapState extends State<BaoCaoThuNhap> {
               const SizedBox(
                 height: 30,
               ),
-              Expanded(child: _chart()),
+              Expanded(child: chartFacade.generateChart(_tooltip)),
               const SizedBox(
                 height: 10,
               ),
@@ -200,34 +213,6 @@ class _BaoCaoThuNhapState extends State<BaoCaoThuNhap> {
         );
       },
     );
-  }
-
-  //
-  // Dữ liệu cho chart Line
-  //
-
-  SfCartesianChart _chart() {
-    data = getData();
-    double maximum = _highestNum.toDouble();
-    return SfCartesianChart(
-        primaryXAxis: CategoryAxis(name: "DOANH THU"),
-        primaryYAxis:
-            NumericAxis(minimum: 0, maximum: maximum, interval: _interval),
-        tooltipBehavior: _tooltip,
-        series: <CartesianSeries<dynamic, dynamic>>[
-          ColumnSeries<_ChartData, String>(
-              dataSource: data,
-              xValueMapper: (_ChartData data, _) => data.x,
-              yValueMapper: (_ChartData data, _) => data.fine,
-              name: 'Phạt',
-              color: mainColor),
-          LineSeries<_ChartData, String>(
-              dataSource: data,
-              xValueMapper: (_ChartData data, _) => data.x,
-              yValueMapper: (_ChartData data, _) => data.fee,
-              name: 'Tạo thẻ',
-              color: secondaryColor)
-        ]);
   }
 
   List<_ChartData> getData() {

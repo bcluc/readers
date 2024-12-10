@@ -1,9 +1,7 @@
 import 'package:dart_date/dart_date.dart';
-import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
 import 'package:readers/components/label_text_form_field.dart';
 import 'package:readers/components/label_text_form_field_datepicker.dart';
 import 'package:readers/cubit/selected_cuon_sach_cho_muon.dart';
@@ -15,8 +13,8 @@ import 'package:readers/screens/borrow_return/muon_sach/sach_da_chon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_trong_kho.dart';
 import 'package:readers/utils/common_variables.dart';
 import 'package:readers/utils/extension.dart';
+import 'package:readers/utils/facade/pdf_facade/pdf_facade.dart';
 import 'package:readers/utils/parameters.dart';
-import 'package:readers/utils/pdf_api.dart';
 
 class MuonSach extends StatefulWidget {
   const MuonSach({super.key});
@@ -254,20 +252,8 @@ class _MuonSachState extends State<MuonSach> {
     }
 
     if (_isInPhieuMuon) {
-      final phieuMuonDocument = await PdfApi.generatePhieuMuon(
-        maDocGia: _maDocGia,
-        hoTen: _hoTenDocGia,
-        ngayMuon: _ngayMuonController.text,
-        hanTra: _hanTraController.text,
-        cuonSachs: cuonSachs,
-      );
-      final phieuMuonPdfFile = await PdfApi.saveDocument(
-        name: removeDiacritics(_hoTenDocGia).replaceAll(' ', '') +
-            DateFormat('_ddMMyyyy_Hms').format(DateTime.now()),
-        pdfDoc: phieuMuonDocument,
-      );
-
-      PdfApi.openFile(phieuMuonPdfFile);
+      PdfFacade.generateAndOpenPhieuMuon(_ngayMuonController.text,
+          _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
     }
 
     /* Sau khi lưu xong dữ liệu vào DB thì ta reset lại trang */
