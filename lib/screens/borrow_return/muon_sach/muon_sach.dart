@@ -13,6 +13,7 @@ import 'package:readers/screens/borrow_return/muon_sach/sach_da_chon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_trong_kho.dart';
 import 'package:readers/utils/common_variables.dart';
 import 'package:readers/utils/extension.dart';
+import 'package:readers/utils/facade/excel_facade/excel_facade.dart';
 import 'package:readers/utils/facade/pdf_facade/pdf_facade.dart';
 import 'package:readers/utils/parameters.dart';
 
@@ -252,7 +253,9 @@ class _MuonSachState extends State<MuonSach> {
     }
 
     if (_isInPhieuMuon) {
-      PdfFacade.generateAndOpenPhieuMuon(_ngayMuonController.text,
+   //   PdfFacade.generateAndOpenPhieuMuon(_ngayMuonController.text,
+     //     _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
+      ExcelFacade.generateAndOpenPhieuMuon(_ngayMuonController.text,
           _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
     }
 
