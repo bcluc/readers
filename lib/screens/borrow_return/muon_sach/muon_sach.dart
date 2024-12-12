@@ -11,6 +11,9 @@ import 'package:readers/models/phieu_muon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/xuat_phieu_muon_switch.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_da_chon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_trong_kho.dart';
+import 'package:readers/utils/Export_file_strategy/export_file_excel_strategy.dart';
+import 'package:readers/utils/Export_file_strategy/export_file_pdf_strategy.dart';
+import 'package:readers/utils/Export_file_strategy/export_file_strategy.dart';
 import 'package:readers/utils/common_variables.dart';
 import 'package:readers/utils/extension.dart';
 import 'package:readers/utils/facade/excel_facade/excel_facade.dart';
@@ -50,6 +53,8 @@ class _MuonSachState extends State<MuonSach> {
   String _hoTenDocGia = '';
   String _soSachDangMuon = '';
   bool _isInPhieuMuon = true;
+  bool _exportAsPDF = true;
+  String _selectedOption = 'Pdf';
 
   Future<void> _searchMaDocGia() async {
     _errorText = '';
@@ -253,10 +258,17 @@ class _MuonSachState extends State<MuonSach> {
     }
 
     if (_isInPhieuMuon) {
-   //   PdfFacade.generateAndOpenPhieuMuon(_ngayMuonController.text,
-     //     _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
-      ExcelFacade.generateAndOpenPhieuMuon(_ngayMuonController.text,
-          _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
+      if (_selectedOption == 'Pdf') {
+        Exportfilestrategy exportfilestrategy =
+            ExportFilePdfStrategy(PdfFacade());
+        exportfilestrategy.XuatPhieuMuon(_ngayMuonController.text,
+            _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
+      } else {
+        Exportfilestrategy exportfilestrategy =
+            ExportFileExcelStrategy(ExcelFacade());
+        exportfilestrategy.XuatPhieuMuon(_ngayMuonController.text,
+            _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
+      }
     }
 
     /* Sau khi lưu xong dữ liệu vào DB thì ta reset lại trang */
@@ -440,8 +452,42 @@ class _MuonSachState extends State<MuonSach> {
               ),
               const Gap(30),
               Expanded(
-                child: XuatPhieuMuonSwitch(
-                  onSwitchChanged: (value) => _isInPhieuMuon = value,
+                child: Column(
+                  children: [
+                    XuatPhieuMuonSwitch(
+                      onSwitchChanged: (value) => _isInPhieuMuon = value,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            value: 'Pdf',
+                            groupValue: _selectedOption,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedOption = value!;
+                              });
+                            },
+                            title: const Text('Pdf'),
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            value: 'Excel',
+                            groupValue: _selectedOption,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedOption = value!;
+                              });
+                            },
+                            title: const Text('Excel'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],

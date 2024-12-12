@@ -5,7 +5,7 @@ import 'package:readers/utils/facade/pdf_facade/pdf_generator.dart';
 import 'package:readers/utils/facade/pdf_facade/pdf_handler.dart';
 
 class PdfFacade {
-  static void generateAndOpenPhieuMuon(
+   void generateAndOpenPhieuMuon(
     String ngayMuon,
     String hanTra,
     String maDocGia,

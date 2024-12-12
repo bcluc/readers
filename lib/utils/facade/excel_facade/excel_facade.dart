@@ -5,7 +5,7 @@ import 'package:readers/utils/facade/excel_facade/excel_generator.dart';
 import 'package:readers/utils/facade/excel_facade/excel_handler.dart';
 
 class ExcelFacade {
-  static void generateAndOpenPhieuMuon(
+ void generateAndOpenPhieuMuon(
     String ngayMuon,
     String hanTra,
     String maDocGia,
