@@ -24,6 +24,7 @@ import 'package:readers/models/tac_gia.dart';
 import 'package:readers/models/the_loai.dart';
 import 'package:readers/utils/common_variables.dart';
 import 'package:readers/utils/extension.dart';
+import 'package:readers/utils/parameters.dart';
 import 'package:sqflite/utils/utils.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -247,6 +248,7 @@ class DbProcess {
       ''',
       [giaTri],
     );
+    ThamSoQuyDinh.thietLapThamSo(await queryThamSoQuyDinh());
   }
 
   // ĐỘC GIẢ CODE

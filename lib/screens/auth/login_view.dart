@@ -4,7 +4,7 @@ import 'package:readers/components/password_text_field.dart';
 import 'package:readers/main.dart';
 import 'package:readers/screens/library_management.dart';
 import 'package:readers/utils/common_variables.dart';
-import 'package:readers/utils/parameters.dart';
+// import 'package:readers/utils/parameters.dart';
 import 'package:page_transition/page_transition.dart';
 
 class LoginView extends StatefulWidget {
@@ -21,8 +21,8 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController(text: 'admin');
+  final _passwordController = TextEditingController(text: '123456');
 
   bool _isProcessing = false;
 
@@ -63,7 +63,6 @@ class _LoginViewState extends State<LoginView> {
       await Future.delayed(
         const Duration(milliseconds: 400),
       );
-      ThamSoQuyDinh.thietLapThamSo(await dbProcess.queryThamSoQuyDinh());
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

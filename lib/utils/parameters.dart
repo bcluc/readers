@@ -1,6 +1,8 @@
 import 'package:readers/utils/extension.dart';
 
 class ThamSoQuyDinh {
+  static ThamSoQuyDinh? _instance = ThamSoQuyDinh._privateConstructor();
+
   static String tenThuVien = '';
   static String diaChi = '';
   static String soDienThoai = '';
@@ -12,12 +14,21 @@ class ThamSoQuyDinh {
   static int phiTaoThe = 0; // đơn vị VND
   static int thoiHanThe = 0; // đơn vị tháng
 
+  ThamSoQuyDinh._privateConstructor();
+
+  factory ThamSoQuyDinh() {
+    // ignore: prefer_conditional_assignment
+    if (_instance == null) {
+      _instance ??= ThamSoQuyDinh._privateConstructor();
+    }
+    return _instance!;
+  }
+
   static void thietLapThamSo(Map<String, dynamic> thamSo) {
     tenThuVien = thamSo['TenThuVien'];
     diaChi = thamSo['DiaChi'];
     soDienThoai = thamSo['SoDienThoai'];
     email = thamSo['Email'];
-
     soNgayMuonToiDa = thamSo['SoNgayMuonToiDa'];
     soSachMuonToiDa = thamSo['SoSachMuonToiDa'];
     mucThuTienPhat = thamSo['MucThuTienPhat'];
