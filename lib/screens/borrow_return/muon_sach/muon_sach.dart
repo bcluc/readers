@@ -44,6 +44,7 @@ class _MuonSachState extends State<MuonSach> {
   */
   final _maCuonSachToAddCuonSachController = TextEditingController();
   final _searchCuonSachController = TextEditingController();
+  late Exportfilestrategy _exportFileStrategy;
 
   bool _isProcessingMaDocGia = false;
   bool _isProcessingLuuPhieuMuon = false;
@@ -259,14 +260,14 @@ class _MuonSachState extends State<MuonSach> {
 
     if (_isInPhieuMuon) {
       if (_selectedOption == 'Pdf') {
-        Exportfilestrategy exportfilestrategy =
+        _exportFileStrategy =
             ExportFilePdfStrategy(PdfFacade());
-        exportfilestrategy.XuatPhieuMuon(_ngayMuonController.text,
+        _exportFileStrategy.XuatPhieuMuon(_ngayMuonController.text,
             _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
       } else {
-        Exportfilestrategy exportfilestrategy =
+        _exportFileStrategy =
             ExportFileExcelStrategy(ExcelFacade());
-        exportfilestrategy.XuatPhieuMuon(_ngayMuonController.text,
+        _exportFileStrategy.XuatPhieuMuon(_ngayMuonController.text,
             _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
       }
     }
