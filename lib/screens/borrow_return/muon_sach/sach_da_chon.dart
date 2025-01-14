@@ -26,8 +26,6 @@ class SachDaChon extends StatefulWidget {
 
 class _SachDaChonState extends State<SachDaChon> {
   late final UIBookObserver _uiObserver;
-  late final DatabaseBookObserver _dbObserver;
-  late final StatisticsBookObserver _statsObserver;
   final _bookBorrowSubject = BookBorrowSubject();
 
   @override
@@ -35,21 +33,18 @@ class _SachDaChonState extends State<SachDaChon> {
     super.initState();
     // Initialize observers
     _uiObserver = UIBookObserver(context);
-    _dbObserver = DatabaseBookObserver();
-    _statsObserver = StatisticsBookObserver();
+
 
     // Add observers to subject
     _bookBorrowSubject.addObserver(_uiObserver);
-    _bookBorrowSubject.addObserver(_dbObserver);
-    _bookBorrowSubject.addObserver(_statsObserver);
+
   }
 
   @override
   void dispose() {
     // Remove observers when widget is disposed
     _bookBorrowSubject.removeObserver(_uiObserver);
-    _bookBorrowSubject.removeObserver(_dbObserver);
-    _bookBorrowSubject.removeObserver(_statsObserver);
+
     super.dispose();
   }
 
