@@ -1,9 +1,7 @@
 import 'package:dart_date/dart_date.dart';
-import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
 import 'package:readers/components/label_text_form_field.dart';
 import 'package:readers/components/label_text_form_field_datepicker.dart';
 import 'package:readers/cubit/selected_cuon_sach_cho_muon.dart';
@@ -13,10 +11,14 @@ import 'package:readers/models/phieu_muon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/xuat_phieu_muon_switch.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_da_chon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_trong_kho.dart';
+import 'package:readers/utils/Export_file_strategy/export_file_excel_strategy.dart';
+import 'package:readers/utils/Export_file_strategy/export_file_pdf_strategy.dart';
+import 'package:readers/utils/Export_file_strategy/export_file_strategy.dart';
 import 'package:readers/utils/common_variables.dart';
 import 'package:readers/utils/extension.dart';
+import 'package:readers/utils/facade/excel_facade/excel_facade.dart';
+import 'package:readers/utils/facade/pdf_facade/pdf_facade.dart';
 import 'package:readers/utils/parameters.dart';
-import 'package:readers/utils/pdf_api.dart';
 
 class MuonSach extends StatefulWidget {
   const MuonSach({super.key});
@@ -42,6 +44,7 @@ class _MuonSachState extends State<MuonSach> {
   */
   final _maCuonSachToAddCuonSachController = TextEditingController();
   final _searchCuonSachController = TextEditingController();
+  late Exportfilestrategy _exportFileStrategy;
 
   bool _isProcessingMaDocGia = false;
   bool _isProcessingLuuPhieuMuon = false;
@@ -51,6 +54,8 @@ class _MuonSachState extends State<MuonSach> {
   String _hoTenDocGia = '';
   String _soSachDangMuon = '';
   bool _isInPhieuMuon = true;
+  bool _exportAsPDF = true;
+  String _selectedOption = 'Pdf';
 
   Future<void> _searchMaDocGia() async {
     _errorText = '';
@@ -254,20 +259,17 @@ class _MuonSachState extends State<MuonSach> {
     }
 
     if (_isInPhieuMuon) {
-      final phieuMuonDocument = await PdfApi.generatePhieuMuon(
-        maDocGia: _maDocGia,
-        hoTen: _hoTenDocGia,
-        ngayMuon: _ngayMuonController.text,
-        hanTra: _hanTraController.text,
-        cuonSachs: cuonSachs,
-      );
-      final phieuMuonPdfFile = await PdfApi.saveDocument(
-        name: removeDiacritics(_hoTenDocGia).replaceAll(' ', '') +
-            DateFormat('_ddMMyyyy_Hms').format(DateTime.now()),
-        pdfDoc: phieuMuonDocument,
-      );
-
-      PdfApi.openFile(phieuMuonPdfFile);
+      if (_selectedOption == 'Pdf') {
+        _exportFileStrategy =
+            ExportFilePdfStrategy(PdfFacade());
+        _exportFileStrategy.XuatPhieuMuon(_ngayMuonController.text,
+            _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
+      } else {
+        _exportFileStrategy =
+            ExportFileExcelStrategy(ExcelFacade());
+        _exportFileStrategy.XuatPhieuMuon(_ngayMuonController.text,
+            _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
+      }
     }
 
     /* Sau khi lưu xong dữ liệu vào DB thì ta reset lại trang */
@@ -451,8 +453,42 @@ class _MuonSachState extends State<MuonSach> {
               ),
               const Gap(30),
               Expanded(
-                child: XuatPhieuMuonSwitch(
-                  onSwitchChanged: (value) => _isInPhieuMuon = value,
+                child: Column(
+                  children: [
+                    XuatPhieuMuonSwitch(
+                      onSwitchChanged: (value) => _isInPhieuMuon = value,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            value: 'Pdf',
+                            groupValue: _selectedOption,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedOption = value!;
+                              });
+                            },
+                            title: const Text('Pdf'),
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            value: 'Excel',
+                            groupValue: _selectedOption,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedOption = value!;
+                              });
+                            },
+                            title: const Text('Excel'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
