@@ -18,7 +18,6 @@ class TheLoaiForm extends StatefulWidget {
 class _TheLoaiFormState extends State<TheLoaiForm> {
   late final List<TheLoai> _theLoais;
   late List<TheLoai> _filteredTheLoais;
-  final template = TheLoai.creatNewTemplate();
 
   late final Future<void> _futureTacGias = _getTacGias();
   Future<void> _getTacGias() async {

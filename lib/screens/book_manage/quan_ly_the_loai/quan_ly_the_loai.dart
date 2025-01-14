@@ -8,7 +8,6 @@ import 'package:readers/screens/book_manage/quan_ly_the_loai/edit_ten_the_loai.d
 import 'package:readers/screens/book_manage/quan_ly_the_loai/tat_ca_sach_thuoc_the_loai.dart';
 import 'package:readers/utils/common_variables.dart';
 import 'package:readers/utils/extension.dart';
-import 'package:readers/state/book_state_observer.dart';
 
 class QuanLyTheLoai extends StatefulWidget {
   const QuanLyTheLoai({super.key});
@@ -19,10 +18,8 @@ class QuanLyTheLoai extends StatefulWidget {
 
 class _QuanLyTheLoaiState extends State<QuanLyTheLoai> {
   /* _theLoais lưu chứa những thể loại ở dạng chữ in thường */
-  final _bookStateManager = BookStateManager();
   late final List<TheLoaiDto> _theLoais;
   late List<TheLoaiDto> _filteredTheLoais;
-  final template = TheLoai.creatNewTemplate();
 
   int _selectedRow = -1;
 
@@ -79,9 +76,9 @@ class _QuanLyTheLoaiState extends State<QuanLyTheLoai> {
       }
     }
 
-    final newTheLoai = template.cloneWith(tenTheLoai: tenTheLoaiInThuong);
-
-    final returningId = await dbProcess.insertTheLoai(newTheLoai);
+    final returningId = await dbProcess.insertTheLoai(
+      TheLoai(null, tenTheLoaiInThuong),
+    );
 
     _themTheLoaiController.clear();
 
@@ -106,13 +103,6 @@ class _QuanLyTheLoaiState extends State<QuanLyTheLoai> {
       );
     }
   }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _bookStateManager.addObserver(this);
-  //   _loadInitialData();
-  // }
 
   @override
   Widget build(BuildContext context) {

@@ -5,12 +5,10 @@ import 'package:readers/components/inform_dialog.dart';
 import 'package:readers/cubit/selected_cuon_sach_cho_muon.dart';
 import 'package:readers/dto/cuon_sach_dto_2th.dart';
 import 'package:readers/main.dart';
-import 'package:readers/models/observers/book_borrow_observer.dart';
-import 'package:readers/models/observers/concrete_book_observers.dart';
 import 'package:readers/utils/extension.dart';
 import 'package:readers/utils/parameters.dart';
 
-class SachDaChon extends StatefulWidget {
+class SachDaChon extends StatelessWidget {
   const SachDaChon(
     this.maCuonSachToAddCuonSachController, {
     super.key,
@@ -20,37 +18,9 @@ class SachDaChon extends StatefulWidget {
   final TextEditingController maCuonSachToAddCuonSachController;
   final int soSachCoTheMuon;
 
-  @override
-  State<SachDaChon> createState() => _SachDaChonState();
-}
-
-class _SachDaChonState extends State<SachDaChon> {
-  late final UIBookObserver _uiObserver;
-  final _bookBorrowSubject = BookBorrowSubject();
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize observers
-    _uiObserver = UIBookObserver(context);
-
-
-    // Add observers to subject
-    _bookBorrowSubject.addObserver(_uiObserver);
-
-  }
-
-  @override
-  void dispose() {
-    // Remove observers when widget is disposed
-    _bookBorrowSubject.removeObserver(_uiObserver);
-
-    super.dispose();
-  }
-
   void _addCuonSachWithMaCuonSach(BuildContext context) async {
     /* Kiểm tra đã nhập Mã Độc giả chưa */
-    if (widget.soSachCoTheMuon == ThamSoQuyDinh.soSachMuonToiDa + 1) {
+    if (soSachCoTheMuon == ThamSoQuyDinh.soSachMuonToiDa + 1) {
       showDialog(
         context: context,
         builder: (ctx) => const InformDialog(
@@ -62,20 +32,30 @@ class _SachDaChonState extends State<SachDaChon> {
 
     /* Kiểm tra còn có thể mượn thêm sách không */
     if (context.read<SelectedCuonSachChoMuonCubit>().state.length ==
-        widget.soSachCoTheMuon) {
+        soSachCoTheMuon) {
+      /* Hiện thông báo đã mượn đủ số lượng quy định */
       showDialog(
         context: context,
         builder: (ctx) => InformDialog(
           content:
-              'Độc giả này chỉ có thể mượn thêm tối đa ${widget.soSachCoTheMuon} cuốn sách!',
+              'Độc giả này chỉ có thể mượn thêm tối đa $soSachCoTheMuon cuốn sách!',
         ),
       );
       return;
     }
 
-    String maCuonSach = widget.maCuonSachToAddCuonSachController.text.trim();
-    if (maCuonSach.isEmpty) return;
+    String maCuonSach = maCuonSachToAddCuonSachController.text.trim();
+    if (maCuonSach.isEmpty) {
+      /* Do nothing */
+      return;
+    }
 
+    /* 
+    Kiểm tra xem Mã cuốn sách này đã được chọn từ trước hay chưa
+    VD:
+    Thủ thư đã chọn cuốn 665-Cố Định Một Đám Mây-Nguyễn Ngọc Tư
+    Sau đó Thủ thư nhập tiếp cuốn 665 nữa là sai
+    */
     final isSelected = context
         .read<SelectedCuonSachChoMuonCubit>()
         .containMaCuonSach(maCuonSach);
@@ -98,6 +78,7 @@ class _SachDaChonState extends State<SachDaChon> {
     CuonSachDto2th? cuonSach =
         await dbProcess.queryCuonSachDto2thSanCoWithMaCuonSach(maCuonSach);
     if (cuonSach == null) {
+      // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (ctx) => const InformDialog(
@@ -105,18 +86,9 @@ class _SachDaChonState extends State<SachDaChon> {
         ),
       );
     } else {
-      // Notify observers about book being borrowed
-      _bookBorrowSubject.notifyBookBorrowed(
-        cuonSach.maCuonSach.toString(),
-        cuonSach.tenDauSach,
-      );
-      _bookBorrowSubject.notifyBookStatusChanged(
-        cuonSach.maCuonSach.toString(),
-        "Đang mượn",
-      );
-
+      // ignore: use_build_context_synchronously
       context.read<SelectedCuonSachChoMuonCubit>().add(cuonSach);
-      widget.maCuonSachToAddCuonSachController.clear();
+      maCuonSachToAddCuonSachController.clear();
     }
   }
 
@@ -137,7 +109,7 @@ class _SachDaChonState extends State<SachDaChon> {
           children: [
             Expanded(
               child: TextField(
-                controller: widget.maCuonSachToAddCuonSachController,
+                controller: maCuonSachToAddCuonSachController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor:
