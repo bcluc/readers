@@ -6,12 +6,9 @@ import 'package:readers/components/label_text_form_field.dart';
 import 'package:readers/components/label_text_form_field_datepicker.dart';
 import 'package:readers/cubit/selected_cuon_sach_cho_muon.dart';
 import 'package:readers/dto/cuon_sach_dto_2th.dart';
-import 'package:readers/main.dart';
-import 'package:readers/models/phieu_muon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/xuat_phieu_muon_switch.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_da_chon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_trong_kho.dart';
-import 'package:readers/utils/CoR/handler.dart';
 import 'package:readers/utils/CoR/save_data_handler.dart';
 import 'package:readers/utils/CoR/save_phieu_muon_base_handler.dart';
 import 'package:readers/utils/CoR/validate_cuon_sach_handler.dart';
@@ -20,8 +17,12 @@ import 'package:readers/utils/CoR/validate_ma_doc_gia_base_handler.dart';
 import 'package:readers/utils/CoR/validate_ma_doc_gia_empty_handler.dart';
 import 'package:readers/utils/CoR/validate_mdg_exist_handler.dart';
 import 'package:readers/utils/CoR/validate_mdg_null_string_handler.dart';
+import 'package:readers/utils/Export_file_strategy/export_file_excel_strategy.dart';
+import 'package:readers/utils/Export_file_strategy/export_file_pdf_strategy.dart';
+import 'package:readers/utils/Export_file_strategy/export_file_strategy.dart';
 import 'package:readers/utils/common_variables.dart';
 import 'package:readers/utils/extension.dart';
+import 'package:readers/utils/facade/excel_facade/excel_facade.dart';
 import 'package:readers/utils/facade/pdf_facade/pdf_facade.dart';
 import 'package:readers/utils/parameters.dart';
 
@@ -49,6 +50,7 @@ class _MuonSachState extends State<MuonSach> {
   */
   final _maCuonSachToAddCuonSachController = TextEditingController();
   final _searchCuonSachController = TextEditingController();
+  late Exportfilestrategy _exportFileStrategy;
 
   bool _isProcessingMaDocGia = false;
   bool _isProcessingLuuPhieuMuon = false;
@@ -58,6 +60,8 @@ class _MuonSachState extends State<MuonSach> {
   String _hoTenDocGia = '';
   String _soSachDangMuon = '';
   bool _isInPhieuMuon = true;
+  bool _exportAsPDF = true;
+  String _selectedOption = 'Pdf';
 
   Future<void> _searchMaDocGia() async {
     // _errorText = '';
@@ -331,6 +335,33 @@ class _MuonSachState extends State<MuonSach> {
         const SnackBar(content: Text('Lưu Phiếu Mượn thành công')),
       );
     });
+
+    if (_isInPhieuMuon) {
+      if (_selectedOption == 'Pdf') {
+        _exportFileStrategy = ExportFilePdfStrategy(PdfFacade());
+        _exportFileStrategy.XuatPhieuMuon(_ngayMuonController.text,
+            _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
+      } else {
+        _exportFileStrategy = ExportFileExcelStrategy(ExcelFacade());
+        _exportFileStrategy.XuatPhieuMuon(_ngayMuonController.text,
+            _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
+      }
+    }
+
+    /* Sau khi lưu xong dữ liệu vào DB thì ta reset lại trang */
+    _searchMaDocGiaController.clear();
+
+    _searchCuonSachController.clear();
+    _maCuonSachToAddCuonSachController.clear();
+    setState(() {
+      _maDocGia = '';
+      _hoTenDocGia = '';
+      _soSachDangMuon = '';
+    });
+
+    setState(() {
+      _isProcessingLuuPhieuMuon = false;
+    });
   }
 
   @override
@@ -498,8 +529,42 @@ class _MuonSachState extends State<MuonSach> {
               ),
               const Gap(30),
               Expanded(
-                child: XuatPhieuMuonSwitch(
-                  onSwitchChanged: (value) => _isInPhieuMuon = value,
+                child: Column(
+                  children: [
+                    XuatPhieuMuonSwitch(
+                      onSwitchChanged: (value) => _isInPhieuMuon = value,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            value: 'Pdf',
+                            groupValue: _selectedOption,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedOption = value!;
+                              });
+                            },
+                            title: const Text('Pdf'),
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            value: 'Excel',
+                            groupValue: _selectedOption,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedOption = value!;
+                              });
+                            },
+                            title: const Text('Excel'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
