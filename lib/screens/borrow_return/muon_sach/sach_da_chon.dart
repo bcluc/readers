@@ -5,10 +5,12 @@ import 'package:readers/components/inform_dialog.dart';
 import 'package:readers/cubit/selected_cuon_sach_cho_muon.dart';
 import 'package:readers/dto/cuon_sach_dto_2th.dart';
 import 'package:readers/main.dart';
+import 'package:readers/models/observers/book_borrow_observer.dart';
+import 'package:readers/models/observers/concrete_book_observers.dart';
 import 'package:readers/utils/extension.dart';
 import 'package:readers/utils/parameters.dart';
 
-class SachDaChon extends StatelessWidget {
+class SachDaChon extends StatefulWidget {
   const SachDaChon(
     this.maCuonSachToAddCuonSachController, {
     super.key,
@@ -18,9 +20,42 @@ class SachDaChon extends StatelessWidget {
   final TextEditingController maCuonSachToAddCuonSachController;
   final int soSachCoTheMuon;
 
+  @override
+  State<SachDaChon> createState() => _SachDaChonState();
+}
+
+class _SachDaChonState extends State<SachDaChon> {
+  late final UIBookObserver _uiObserver;
+  late final DatabaseBookObserver _dbObserver;
+  late final StatisticsBookObserver _statsObserver;
+  final _bookBorrowSubject = BookBorrowSubject();
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize observers
+    _uiObserver = UIBookObserver(context);
+    _dbObserver = DatabaseBookObserver();
+    _statsObserver = StatisticsBookObserver();
+
+    // Add observers to subject
+    _bookBorrowSubject.addObserver(_uiObserver);
+    _bookBorrowSubject.addObserver(_dbObserver);
+    _bookBorrowSubject.addObserver(_statsObserver);
+  }
+
+  @override
+  void dispose() {
+    // Remove observers when widget is disposed
+    _bookBorrowSubject.removeObserver(_uiObserver);
+    _bookBorrowSubject.removeObserver(_dbObserver);
+    _bookBorrowSubject.removeObserver(_statsObserver);
+    super.dispose();
+  }
+
   void _addCuonSachWithMaCuonSach(BuildContext context) async {
     /* Kiểm tra đã nhập Mã Độc giả chưa */
-    if (soSachCoTheMuon == ThamSoQuyDinh.soSachMuonToiDa + 1) {
+    if (widget.soSachCoTheMuon == ThamSoQuyDinh.soSachMuonToiDa + 1) {
       showDialog(
         context: context,
         builder: (ctx) => const InformDialog(
@@ -32,30 +67,20 @@ class SachDaChon extends StatelessWidget {
 
     /* Kiểm tra còn có thể mượn thêm sách không */
     if (context.read<SelectedCuonSachChoMuonCubit>().state.length ==
-        soSachCoTheMuon) {
-      /* Hiện thông báo đã mượn đủ số lượng quy định */
+        widget.soSachCoTheMuon) {
       showDialog(
         context: context,
         builder: (ctx) => InformDialog(
           content:
-              'Độc giả này chỉ có thể mượn thêm tối đa $soSachCoTheMuon cuốn sách!',
+              'Độc giả này chỉ có thể mượn thêm tối đa ${widget.soSachCoTheMuon} cuốn sách!',
         ),
       );
       return;
     }
 
-    String maCuonSach = maCuonSachToAddCuonSachController.text.trim();
-    if (maCuonSach.isEmpty) {
-      /* Do nothing */
-      return;
-    }
+    String maCuonSach = widget.maCuonSachToAddCuonSachController.text.trim();
+    if (maCuonSach.isEmpty) return;
 
-    /* 
-    Kiểm tra xem Mã cuốn sách này đã được chọn từ trước hay chưa
-    VD:
-    Thủ thư đã chọn cuốn 665-Cố Định Một Đám Mây-Nguyễn Ngọc Tư
-    Sau đó Thủ thư nhập tiếp cuốn 665 nữa là sai
-    */
     final isSelected = context
         .read<SelectedCuonSachChoMuonCubit>()
         .containMaCuonSach(maCuonSach);
@@ -78,7 +103,6 @@ class SachDaChon extends StatelessWidget {
     CuonSachDto2th? cuonSach =
         await dbProcess.queryCuonSachDto2thSanCoWithMaCuonSach(maCuonSach);
     if (cuonSach == null) {
-      // ignore: use_build_context_synchronously
       showDialog(
         context: context,
         builder: (ctx) => const InformDialog(
@@ -86,9 +110,18 @@ class SachDaChon extends StatelessWidget {
         ),
       );
     } else {
-      // ignore: use_build_context_synchronously
+      // Notify observers about book being borrowed
+      _bookBorrowSubject.notifyBookBorrowed(
+        cuonSach.maCuonSach.toString(),
+        cuonSach.tenDauSach,
+      );
+      _bookBorrowSubject.notifyBookStatusChanged(
+        cuonSach.maCuonSach.toString(),
+        "Đang mượn",
+      );
+
       context.read<SelectedCuonSachChoMuonCubit>().add(cuonSach);
-      maCuonSachToAddCuonSachController.clear();
+      widget.maCuonSachToAddCuonSachController.clear();
     }
   }
 
@@ -109,7 +142,7 @@ class SachDaChon extends StatelessWidget {
           children: [
             Expanded(
               child: TextField(
-                controller: maCuonSachToAddCuonSachController,
+                controller: widget.maCuonSachToAddCuonSachController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor:
