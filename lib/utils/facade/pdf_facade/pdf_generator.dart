@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:printing/printing.dart';
 import 'package:readers/dto/cuon_sach_dto_2th.dart';
 import 'package:readers/utils/extension.dart';
 import 'package:readers/utils/parameters.dart';
@@ -17,9 +16,12 @@ class PdfGenerator {
   }) async {
     final pdf = Document();
 
-    final nunitoRegularFont = await PdfGoogleFonts.nunitoRegular();
-    final nunitoBoldFont = await PdfGoogleFonts.nunitoBold();
-    final nunitoItalicFont = await PdfGoogleFonts.nunitoItalic();
+    final nunitoRegularFont =
+        pw.Font.ttf(await rootBundle.load('assets/fonts/Roboto-Regular.ttf'));
+    final nunitoBoldFont =
+        pw.Font.ttf(await rootBundle.load('assets/fonts/Roboto-Bold.ttf'));
+    final nunitoItalicFont =
+        pw.Font.ttf(await rootBundle.load('assets/fonts/Roboto-Italic.ttf'));
 
     final nunitoRegularTextStyle = pw.TextStyle(font: nunitoRegularFont);
     // final nunitoBoldTextStyle = pw.TextStyle(font: nunitoBoldFont);

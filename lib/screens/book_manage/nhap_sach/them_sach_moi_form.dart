@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:readers/components/label_text_form_field.dart';
-import 'package:readers/cubit/tat_ca_sach_cubit.dart';
+import 'package:readers/features/sach_management/cubit/sach_management_cubit.dart';
 import 'package:readers/main.dart';
 import 'package:readers/models/dau_sach.dart';
 import 'package:readers/models/sach.dart';
@@ -64,17 +64,12 @@ class _ThemSachMoiFormState extends State<ThemSachMoiForm> {
         _filteredDauSachs[_selectedIndex].maDauSach!,
         _filteredDauSachs[_selectedIndex].tenDauSach,
       );
-      int maSachMoi = await dbProcess.insertSach(newSach);
-      newSach.maSach = maSachMoi;
+      // int maSachMoi = await dbProcess.insertSach(newSach);
+      // newSach.maSach = maSachMoi;
 
       // print('(${newSach.maDauSach}, ${newSach.maSach}, ${newSach.lanTaiBan}, ${newSach.nhaXuatBan})');
       setState(() {
-        /* 
-        Đặt dòng context.read này trong đây để khỏi bị thông báo nhắc nhở 
-        Don't use 'BuildContext's across async gaps.
-        Try rewriting the code to not reference the 'BuildContext'
-        */
-        context.read<TatCaSachCubit>().addSach(newSach);
+        context.read<SachManagementCubit>().addSach(newSach);
 
         _selectedIndex = -2;
         _lanTaiBanController.clear();

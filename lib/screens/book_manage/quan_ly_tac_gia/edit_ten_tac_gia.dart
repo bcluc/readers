@@ -1,14 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:readers/features/tac_gia_management/cubit/tac_gia_management_cubit.dart';
+import 'package:readers/features/tac_gia_management/dtos/tac_gia_dto.dart';
 
-class EditTenTacGia extends StatelessWidget {
-  const EditTenTacGia({super.key, required this.tenTacGia});
+class EditTenTacGia extends StatefulWidget {
+  const EditTenTacGia({super.key, required this.tacGia});
 
-  final String tenTacGia;
+  final TacGiaDto tacGia;
+
+  @override
+  State<EditTenTacGia> createState() => _EditTenTacGiaState();
+}
+
+class _EditTenTacGiaState extends State<EditTenTacGia> {
+  final tenTacGiaController = TextEditingController();
+
+  void handleEditTacGia(BuildContext context) async {
+    try {
+      widget.tacGia.tenTacGia = tenTacGiaController.text;
+      await context.read<TacGiaManagementCubit>().updateTacGia(widget.tacGia);
+
+      if (mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
+    } finally {
+      if (mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cập nhật tác giả thành công'),
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    tenTacGiaController.text = widget.tacGia.tenTacGia;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final tenTacGiaController = TextEditingController(text: tenTacGia);
     return Dialog(
       child: SizedBox(
         width: 500,
@@ -53,7 +89,7 @@ class EditTenTacGia extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: FilledButton(
                   onPressed: () {
-                    Navigator.of(context).pop(tenTacGiaController.text);
+                    handleEditTacGia(context);
                   },
                   style: FilledButton.styleFrom(
                     shape: RoundedRectangleBorder(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:readers/dto/cuon_sach_dto.dart';
+import 'package:readers/features/sach_management/dtos/cuon_sach_dto.dart';
 import 'package:readers/main.dart';
 import 'package:readers/screens/book_manage/kho_sach/edit_vi_tri_cuon_sach_form.dart';
 import 'package:readers/screens/book_manage/kho_sach/xem_chi_tiet_phieu_nhap_form.dart';
@@ -271,7 +271,8 @@ class _KetQuaTimKiemState extends State<KetQuaTimKiem> {
                                         }
 
                                         dbProcess.updateViTriCuonSach(
-                                            _cuonSachs[index]);
+                                            _cuonSachs[index].viTri,
+                                            _cuonSachs[index].maCuonSach);
                                       }
                                     },
                                     child: Padding(

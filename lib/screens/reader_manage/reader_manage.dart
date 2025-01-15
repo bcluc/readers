@@ -302,136 +302,126 @@ class _ReaderManageState extends State<ReaderManage> {
                 const SizedBox(height: 12),
 
                 /* Bo góc cho DataTable */
-                Expanded(
-                  flex: 8,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            clipBehavior: Clip.antiAlias,
-                            child: DataTable(
-                              /* Set màu cho Heading */
-                              headingRowColor: MaterialStateColor.resolveWith(
-                                (states) =>
-                                    Theme.of(context).colorScheme.primary,
+                SizedBox(
+                  width: double.infinity,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    clipBehavior: Clip.antiAlias,
+                    child: DataTable(
+                      /* Set màu cho Heading */
+                      headingRowColor: MaterialStateColor.resolveWith(
+                        (states) => Theme.of(context).colorScheme.primary,
+                      ),
+                      /* The horizontal margin between the contents of each data column */
+                      columnSpacing: 40,
+                      dataRowColor: MaterialStateProperty.resolveWith(
+                        (states) => getDataRowColor(context, states),
+                      ),
+                      dataRowMaxHeight: 62,
+                      border: TableBorder.symmetric(),
+                      showCheckboxColumn: false,
+                      columns: List.generate(
+                        _colsName.length,
+                        (index) => DataColumn(
+                          label: Text(
+                            _colsName[index],
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ),
+                      rows: List.generate(
+                        _readerRows.length,
+                        (index) {
+                          DocGia reader = _readerRows[index];
+                          /* Thẻ Độc Giả quá hạn sẽ tô màu xám (black26) */
+                          TextStyle cellTextStyle = TextStyle(
+                              color: reader.ngayHetHan < DateTime.now()
+                                  ? Colors.black26
+                                  : Colors.black);
+
+                          return DataRow(
+                            /* Thẻ Độc Giả quá hạn sẽ tô màu xám (black12) */
+                            // color: reader.ngayHetHan < DateTime.now()
+                            //     ? MaterialStateProperty.resolveWith((states) {
+                            //         if (states.contains(MaterialState.selected)) {
+                            //           return Theme.of(context).colorScheme.primary.withOpacity(0.3);
+                            //         }
+                            //         return Colors.black12;
+                            //       })
+                            //     : null,
+                            selected: _selectedRow == index,
+                            onSelectChanged: (_) => setState(() {
+                              _selectedRow = index;
+                            }),
+                            onLongPress: () {
+                              setState(() {
+                                _selectedRow = index;
+                              });
+                              _logicEditReader();
+                            },
+                            cells: [
+                              DataCell(
+                                Text(
+                                  reader.maDocGia!.toString(),
+                                  style: cellTextStyle,
+                                ),
                               ),
-                              /* The horizontal margin between the contents of each data column */
-                              columnSpacing: 40,
-                              dataRowColor: MaterialStateProperty.resolveWith(
-                                (states) => getDataRowColor(context, states),
-                              ),
-                              dataRowMaxHeight: 62,
-                              border: TableBorder.symmetric(),
-                              showCheckboxColumn: false,
-                              columns: List.generate(
-                                _colsName.length,
-                                (index) => DataColumn(
-                                  label: Text(
-                                    _colsName[index],
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontStyle: FontStyle.italic,
-                                    ),
+                              DataCell(
+                                /* Ràng buộc cho Chiều rộng Tối đa của cột Họ Tên = 150 */
+                                ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 150),
+                                  child: Text(
+                                    reader.hoTen
+                                        .capitalizeFirstLetterOfEachWord(),
+                                    style: cellTextStyle,
                                   ),
                                 ),
                               ),
-                              rows: List.generate(
-                                _readerRows.length,
-                                (index) {
-                                  DocGia reader = _readerRows[index];
-                                  /* Thẻ Độc Giả quá hạn sẽ tô màu xám (black26) */
-                                  TextStyle cellTextStyle = TextStyle(
-                                      color: reader.ngayHetHan < DateTime.now()
-                                          ? Colors.black26
-                                          : Colors.black);
-
-                                  return DataRow(
-                                    /* Thẻ Độc Giả quá hạn sẽ tô màu xám (black12) */
-                                    // color: reader.ngayHetHan < DateTime.now()
-                                    //     ? MaterialStateProperty.resolveWith((states) {
-                                    //         if (states.contains(MaterialState.selected)) {
-                                    //           return Theme.of(context).colorScheme.primary.withOpacity(0.3);
-                                    //         }
-                                    //         return Colors.black12;
-                                    //       })
-                                    //     : null,
-                                    selected: _selectedRow == index,
-                                    onSelectChanged: (_) => setState(() {
-                                      _selectedRow = index;
-                                    }),
-                                    onLongPress: () {
-                                      setState(() {
-                                        _selectedRow = index;
-                                      });
-                                      _logicEditReader();
-                                    },
-                                    cells: [
-                                      DataCell(
-                                        Text(
-                                          reader.maDocGia!.toString(),
-                                          style: cellTextStyle,
-                                        ),
-                                      ),
-                                      DataCell(
-                                        /* Ràng buộc cho Chiều rộng Tối đa của cột Họ Tên = 150 */
-                                        ConstrainedBox(
-                                          constraints: const BoxConstraints(
-                                              maxWidth: 150),
-                                          child: Text(
-                                            reader.hoTen
-                                                .capitalizeFirstLetterOfEachWord(),
-                                            style: cellTextStyle,
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          reader.ngaySinh.toVnFormat(),
-                                          style: cellTextStyle,
-                                        ),
-                                      ),
-                                      DataCell(
-                                        /* 
-                                  Ràng buộc cho Chiều rộng Tối đa của cột Địa chỉ = 250 
-                                  phòng trường hợp địa chỉ quá dài
-                                  */
-                                        ConstrainedBox(
-                                          constraints: const BoxConstraints(
-                                              maxWidth: 250),
-                                          child: Text(
-                                            reader.diaChi,
-                                            style: cellTextStyle,
-                                          ),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          reader.soDienThoai,
-                                          style: cellTextStyle,
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          reader.ngayLapThe.toVnFormat(),
-                                          style: cellTextStyle,
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          reader.ngayHetHan.toVnFormat(),
-                                          style: cellTextStyle,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
+                              DataCell(
+                                Text(
+                                  reader.ngaySinh.toVnFormat(),
+                                  style: cellTextStyle,
+                                ),
                               ),
-                            ),
-                          ),
-                        ],
+                              DataCell(
+                                /* 
+                          Ràng buộc cho Chiều rộng Tối đa của cột Địa chỉ = 250 
+                          phòng trường hợp địa chỉ quá dài
+                          */
+                                ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 250),
+                                  child: Text(
+                                    reader.diaChi,
+                                    style: cellTextStyle,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  reader.soDienThoai,
+                                  style: cellTextStyle,
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  reader.ngayLapThe.toVnFormat(),
+                                  style: cellTextStyle,
+                                ),
+                              ),
+                              DataCell(
+                                Text(
+                                  reader.ngayHetHan.toVnFormat(),
+                                  style: cellTextStyle,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ),

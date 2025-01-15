@@ -2,7 +2,15 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:readers/cubit/tat_ca_sach_cubit.dart';
+import 'package:readers/features/sach_management/cubit/sach_management_cubit.dart';
+import 'package:readers/features/sach_management/data/sach_management_repository.dart';
+import 'package:readers/features/sach_management/data/sach_management_service.dart';
+import 'package:readers/features/tac_gia_management/cubit/tac_gia_management_cubit.dart';
+import 'package:readers/features/tac_gia_management/data/tac_gia_management_repository.dart';
+import 'package:readers/features/tac_gia_management/data/tac_gia_management_service.dart';
+import 'package:readers/features/the_loai_management/cubit/the_loai_management_cubit.dart';
+import 'package:readers/features/the_loai_management/data/the_loai_management_repository.dart';
+import 'package:readers/features/the_loai_management/data/the_loai_management_service.dart';
 import 'package:readers/screens/auth/auth.dart';
 import 'package:readers/utils/db_process.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -20,7 +28,26 @@ void main() async {
     MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => TatCaSachCubit(),
+          create: (_) => SachManagementCubit(
+            // Change SachManagementCubit to TatCaSachCubit
+            SachManagementRepository(
+              sachManagementService: SachManagementService(),
+            ),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => TacGiaManagementCubit(
+            TacGiaManagementRepository(
+              tacGiaManagementService: TacGiaManagementService(),
+            ),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => TheLoaiManagementCubit(
+            TheLoaiManagementRepository(
+              theLoaiManagementService: TheLoaiManagementService(),
+            ),
+          ),
         ),
       ],
       child: const MyApp(),
@@ -28,7 +55,7 @@ void main() async {
   );
 
   doWhenWindowReady(() {
-    const initialSize = Size(1280, 820);
+    const initialSize = Size(1280, 900);
     appWindow.minSize = initialSize;
     appWindow.size = initialSize;
     appWindow.alignment = Alignment.center;

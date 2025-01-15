@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 // Abstract Observer
 abstract class BookBorrowObserver {
   void onBookBorrowed(String maCuonSach, String tenSach);

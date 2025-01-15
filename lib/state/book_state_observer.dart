@@ -28,9 +28,9 @@ class BookStateManager {
   Future<void> addTheLoai(TheLoai theLoai) async {
     try {
       // Add to database
-      final returningId = await dbProcess.insertTheLoai(theLoai);
+      final returningId = await dbProcess.insertTheLoai(theLoai.tenTheLoai);
       final newTheLoai = theLoai.cloneWith(maTheLoai: returningId);
-      
+
       // Notify all observers
       for (var observer in _observers) {
         observer.onTheLoaiAdded(newTheLoai);
@@ -45,8 +45,9 @@ class BookStateManager {
   Future<void> updateTheLoai(TheLoai theLoai) async {
     try {
       // Update in database
-      await dbProcess.updateTheLoai(theLoai.maTheLoai as int, theLoai.tenTheLoai);
-      
+      await dbProcess.updateTheLoai(
+          theLoai.maTheLoai as int, theLoai.tenTheLoai);
+
       // Notify observers
       for (var observer in _observers) {
         observer.onTheLoaiUpdated(theLoai);

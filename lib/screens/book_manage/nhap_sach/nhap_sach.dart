@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:readers/components/label_text_form_field.dart';
 import 'package:readers/components/label_text_form_field_datepicker.dart';
-import 'package:readers/cubit/tat_ca_sach_cubit.dart';
+import 'package:readers/features/sach_management/cubit/sach_management_cubit.dart';
 import 'package:readers/main.dart';
 import 'package:readers/models/chi_tiet_phieu_nhap.dart';
 import 'package:readers/models/phieu_nhap.dart';
@@ -81,6 +81,16 @@ extension NhapSach on BookManageState {
 
       if (message == "updated") {
         setStateNhapSach(() {});
+      }
+    }
+
+    Future<String> getTenDauSach(int maSach) async {
+      final sachs = context.read<SachManagementCubit>().state.sachs;
+      if (sachs != null) {
+        await context.read<SachManagementCubit>().getTenDauSach(maSach, sachs);
+        return context.read<SachManagementCubit>().state.tenDauSach;
+      } else {
+        return '';
       }
     }
 
@@ -305,13 +315,25 @@ extension NhapSach on BookManageState {
                                                 vertical: 15,
                                                 horizontal: 15,
                                               ),
-                                              child: Text(
-                                                context
-                                                    .read<TatCaSachCubit>()
-                                                    .getTenDauSach(
-                                                        chiTietPhieuNhaps[index]
-                                                            .maSach)
-                                                    .capitalizeFirstLetterOfEachWord(),
+                                              child: FutureBuilder<String>(
+                                                future: getTenDauSach(
+                                                  chiTietPhieuNhaps[index]
+                                                      .maSach,
+                                                ),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return const CircularProgressIndicator();
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return const Text('Error');
+                                                  } else {
+                                                    return Text(snapshot.data
+                                                            ?.capitalizeFirstLetterOfEachWord() ??
+                                                        '');
+                                                  }
+                                                },
                                               ),
                                             ),
                                           ),

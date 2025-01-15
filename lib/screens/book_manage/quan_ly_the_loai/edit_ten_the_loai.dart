@@ -1,17 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:readers/features/the_loai_management/cubit/the_loai_management_cubit.dart';
+import 'package:readers/features/the_loai_management/dtos/the_loai_dto.dart';
 
-class EditTenTheLoai extends StatelessWidget {
+class EditTenTheLoai extends StatefulWidget {
   const EditTenTheLoai({
     super.key,
-    required this.tenTheLoai,
+    required this.theLoai,
   });
 
-  final String tenTheLoai;
+  final TheLoaiDto theLoai;
+
+  @override
+  State<EditTenTheLoai> createState() => _EditTenTheLoaiState();
+}
+
+class _EditTenTheLoaiState extends State<EditTenTheLoai> {
+  final tenTheLoaiController = TextEditingController();
+  void handleEditTheLoai(BuildContext context) async {
+    try {
+      widget.theLoai.tenTheLoai = tenTheLoaiController.text;
+      await context
+          .read<TheLoaiManagementCubit>()
+          .updateTheLoai(widget.theLoai);
+
+      if (mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+      }
+    } finally {
+      if (mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cập nhật thể loại thành công'),
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    tenTheLoaiController.text = widget.theLoai.tenTheLoai;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final tenTheLoaiController = TextEditingController(text: tenTheLoai);
     return Dialog(
       child: SizedBox(
         width: 500,
@@ -56,7 +93,7 @@ class EditTenTheLoai extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: FilledButton(
                   onPressed: () {
-                    Navigator.of(context).pop(tenTheLoaiController.text);
+                    handleEditTheLoai(context);
                   },
                   style: FilledButton.styleFrom(
                     shape: RoundedRectangleBorder(

@@ -54,6 +54,7 @@ class _MuonSachState extends State<MuonSach> {
   String _hoTenDocGia = '';
   String _soSachDangMuon = '';
   bool _isInPhieuMuon = true;
+  // ignore: unused_field
   bool _exportAsPDF = true;
   String _selectedOption = 'Pdf';
 
@@ -260,13 +261,11 @@ class _MuonSachState extends State<MuonSach> {
 
     if (_isInPhieuMuon) {
       if (_selectedOption == 'Pdf') {
-        _exportFileStrategy =
-            ExportFilePdfStrategy(PdfFacade());
+        _exportFileStrategy = ExportFilePdfStrategy(PdfFacade());
         _exportFileStrategy.XuatPhieuMuon(_ngayMuonController.text,
             _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
       } else {
-        _exportFileStrategy =
-            ExportFileExcelStrategy(ExcelFacade());
+        _exportFileStrategy = ExportFileExcelStrategy(ExcelFacade());
         _exportFileStrategy.XuatPhieuMuon(_ngayMuonController.text,
             _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
       }
