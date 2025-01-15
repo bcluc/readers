@@ -24,6 +24,7 @@ import 'package:readers/models/tac_gia.dart';
 import 'package:readers/models/the_loai.dart';
 import 'package:readers/utils/extension.dart';
 import 'package:readers/utils/common_variables.dart';
+import 'package:readers/utils/parameters.dart';
 import 'package:sqflite/utils/utils.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -345,7 +346,13 @@ class DbProcess {
   }
 
   Future<int> insertDocGia(DocGia newDocGia) async {
-    return await _database.insert('DocGia', newDocGia.toMap());
+    int maDocGia = await _database.insert('DocGia', newDocGia.toMap());
+    await _database.insert('CT_TaoThe', {
+      'MaDocGia': maDocGia,
+      'PhiTaoThe': ThamSoQuyDinh.phiTaoThe,
+      'NgayTao': DateTime.now().toVnFormat(),
+    });
+    return maDocGia;
   }
 
   Future<void> deleteDocGia(int maDocGia) async {
