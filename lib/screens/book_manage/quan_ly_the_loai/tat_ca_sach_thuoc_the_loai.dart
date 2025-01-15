@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:readers/dto/the_loai_dto.dart';
+import 'package:readers/features/the_loai_management/dtos/the_loai_dto.dart';
 import 'package:readers/main.dart';
 import 'package:readers/utils/extension.dart';
 

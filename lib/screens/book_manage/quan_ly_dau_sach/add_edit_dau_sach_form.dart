@@ -4,6 +4,9 @@ import 'package:gap/gap.dart';
 import 'package:readers/cubit/selected_tac_gia_cubit.dart';
 import 'package:readers/cubit/selected_the_loai_cubit.dart';
 import 'package:readers/dto/dau_sach_dto.dart';
+import 'package:readers/features/tac_gia_management/cubit/tac_gia_management_cubit.dart';
+import 'package:readers/features/tac_gia_management/data/tac_gia_management_repository.dart';
+import 'package:readers/features/tac_gia_management/data/tac_gia_management_service.dart';
 import 'package:readers/screens/book_manage/quan_ly_dau_sach/dau_sach_form.dart';
 import 'package:readers/screens/book_manage/quan_ly_dau_sach/tac_gia_form.dart';
 import 'package:readers/screens/book_manage/quan_ly_dau_sach/the_loai_form.dart';
@@ -28,14 +31,20 @@ class _AddEditDauSachFormState extends State<AddEditDauSachForm> {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (_) => widget.editDauSach == null
-                ? SelectedTacGiaCubit()
-                : SelectedTacGiaCubit.of(widget.editDauSach!.tacGias),
-          ),
+              create: (_) => TacGiaManagementCubit(
+                    TacGiaManagementRepository(
+                      tacGiaManagementService: TacGiaManagementService(),
+                    ),
+                  )),
           BlocProvider(
             create: (_) => widget.editDauSach == null
                 ? SelectedTheLoaiCubit()
                 : SelectedTheLoaiCubit.of(widget.editDauSach!.theLoais),
+          ),
+          BlocProvider(
+            create: (_) => widget.editDauSach == null
+                ? SelectedTacGiaCubit()
+                : SelectedTacGiaCubit.of(widget.editDauSach!.tacGias),
           ),
         ],
         child: Row(

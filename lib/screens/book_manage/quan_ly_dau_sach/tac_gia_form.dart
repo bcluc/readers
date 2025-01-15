@@ -95,7 +95,8 @@ class _TacGiaFormState extends State<TacGiaForm> {
                         null,
                         _themTacGiaController.text,
                       );
-                      int returningId = await dbProcess.insertTacGia(newTacGia);
+                      int returningId =
+                          await dbProcess.insertTacGia(newTacGia.tenTacGia);
                       newTacGia.maTacGia = returningId;
 
                       /* Cập nhật lại danh sách Tác Giả */

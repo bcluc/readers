@@ -95,7 +95,7 @@ class _TheLoaiFormState extends State<TheLoaiForm> {
                         _themTheLoaiController.text,
                       );
                       int returningId =
-                          await dbProcess.insertTheLoai(newTheLoai);
+                          await dbProcess.insertTheLoai(newTheLoai.tenTheLoai);
                       newTheLoai.maTheLoai = returningId;
 
                       /* Cập nhật lại danh sách Tác Giả */

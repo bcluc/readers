@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:readers/dto/tac_gia_dto.dart';
+import 'package:readers/features/tac_gia_management/dtos/tac_gia_dto.dart';
 import 'package:readers/main.dart';
 import 'package:readers/utils/extension.dart';
 
@@ -27,7 +27,7 @@ class _TatCaSachCuaTacGiaState extends State<TatCaSachCuaTacGia> {
     */
     await Future.delayed(kTabScrollDuration);
     _dauSachs =
-        await dbProcess.queryDauSachWithMaTacGia(widget.tacGia.maTacGia);
+        await dbProcess.queryDauSachWithMaTacGia(widget.tacGia.maTacGia!);
   }
 
   @override
