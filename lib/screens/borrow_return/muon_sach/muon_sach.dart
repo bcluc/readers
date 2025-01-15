@@ -6,11 +6,17 @@ import 'package:readers/components/label_text_form_field.dart';
 import 'package:readers/components/label_text_form_field_datepicker.dart';
 import 'package:readers/cubit/selected_cuon_sach_cho_muon.dart';
 import 'package:readers/dto/cuon_sach_dto_2th.dart';
-import 'package:readers/main.dart';
-import 'package:readers/models/phieu_muon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/xuat_phieu_muon_switch.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_da_chon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_trong_kho.dart';
+import 'package:readers/utils/CoR/save_data_handler.dart';
+import 'package:readers/utils/CoR/save_phieu_muon_base_handler.dart';
+import 'package:readers/utils/CoR/validate_cuon_sach_handler.dart';
+import 'package:readers/utils/CoR/validate_expire_date_handler.dart';
+import 'package:readers/utils/CoR/validate_ma_doc_gia_base_handler.dart';
+import 'package:readers/utils/CoR/validate_ma_doc_gia_empty_handler.dart';
+import 'package:readers/utils/CoR/validate_mdg_exist_handler.dart';
+import 'package:readers/utils/CoR/validate_mdg_null_string_handler.dart';
 import 'package:readers/utils/Export_file_strategy/export_file_excel_strategy.dart';
 import 'package:readers/utils/Export_file_strategy/export_file_pdf_strategy.dart';
 import 'package:readers/utils/Export_file_strategy/export_file_strategy.dart';
@@ -59,205 +65,277 @@ class _MuonSachState extends State<MuonSach> {
   String _selectedOption = 'Pdf';
 
   Future<void> _searchMaDocGia() async {
-    _errorText = '';
-    if (_searchMaDocGiaController.text.isEmpty) {
-      _errorText = 'Bạn chưa nhập Mã Độc giả.';
-    } else {
-      if (int.tryParse(_searchMaDocGiaController.text) == null) {
-        _errorText = 'Mã Độc giả là một con số.';
-      }
-    }
+    // _errorText = '';
+    // if (_searchMaDocGiaController.text.isEmpty) {
+    //   _errorText = 'Bạn chưa nhập Mã Độc giả.';
+    // } else {
+    //   if (int.tryParse(_searchMaDocGiaController.text) == null) {
+    //     _errorText = 'Mã Độc giả là một con số.';
+    //   }
+    // }
 
-    if (_errorText.isNotEmpty) {
-      setState(() {});
-      return;
-    }
+    // if (_errorText.isNotEmpty) {
+    //   setState(() {});
+    //   return;
+    // }
 
-    setState(() {
-      _isProcessingMaDocGia = true;
-    });
+    // setState(() {
+    //   _isProcessingMaDocGia = true;
+    // });
 
-    _hoTenDocGia = '';
-    _soSachDangMuon = '';
-    _maDocGia = '';
+    // _hoTenDocGia = '';
+    // _soSachDangMuon = '';
+    // _maDocGia = '';
 
-    int maDocGia = int.parse(_searchMaDocGiaController.text);
+    // int maDocGia = int.parse(_searchMaDocGiaController.text);
 
-    String? hoTen = await dbProcess.queryHoTenDocGiaWithMaDocGia(maDocGia);
-    await Future.delayed(const Duration(milliseconds: 200));
+    // String? hoTen = await dbProcess.queryHoTenDocGiaWithMaDocGia(maDocGia);
+    // await Future.delayed(const Duration(milliseconds: 200));
 
-    if (hoTen == null) {
-      _errorText = 'Không tìm thấy Độc giả.';
-    } else {
-      _hoTenDocGia = hoTen.capitalizeFirstLetterOfEachWord();
+    // if (hoTen == null) {
+    //   _errorText = 'Không tìm thấy Độc giả.';
+    // } else {
+    //   _hoTenDocGia = hoTen.capitalizeFirstLetterOfEachWord();
 
-      /* Kiểm tra thẻ Độc giả còn hạn hay không */
-      if (!await dbProcess.kiemTraHanTheDocGia(maDocGia)) {
-        /* Hết hạn */
-        // ignore: use_build_context_synchronously
-        await showDialog(
-          context: context,
-          builder: (ctx) => Dialog(
-            surfaceTintColor: Colors.transparent,
-            child: SizedBox(
-              width: 300,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.cancel_outlined,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 52,
-                    ),
-                    const Gap(12),
-                    Text(
-                      'Thẻ Độc giả $_hoTenDocGia \n đã hết hạn',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const Gap(16),
-                    FilledButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Đóng'),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
+    //   /* Kiểm tra thẻ Độc giả còn hạn hay không */
+    //   if (!await dbProcess.kiemTraHanTheDocGia(maDocGia)) {
+    //     /* Hết hạn */
+    //     // ignore: use_build_context_synchronously
+    //     await showDialog(
+    //       context: context,
+    //       builder: (ctx) => Dialog(
+    //         surfaceTintColor: Colors.transparent,
+    //         child: SizedBox(
+    //           width: 300,
+    //           child: Padding(
+    //             padding: const EdgeInsets.all(20),
+    //             child: Column(
+    //               mainAxisSize: MainAxisSize.min,
+    //               children: [
+    //                 Icon(
+    //                   Icons.cancel_outlined,
+    //                   color: Theme.of(context).colorScheme.primary,
+    //                   size: 52,
+    //                 ),
+    //                 const Gap(12),
+    //                 Text(
+    //                   'Thẻ Độc giả $_hoTenDocGia \n đã hết hạn',
+    //                   style: const TextStyle(
+    //                     fontSize: 16,
+    //                     fontWeight: FontWeight.bold,
+    //                   ),
+    //                   textAlign: TextAlign.center,
+    //                 ),
+    //                 const Gap(16),
+    //                 FilledButton(
+    //                   onPressed: () => Navigator.of(context).pop(),
+    //                   child: const Text('Đóng'),
+    //                 )
+    //               ],
+    //             ),
+    //           ),
+    //         ),
+    //       ),
+    //     );
 
-        _searchMaDocGiaController.clear();
-        _hoTenDocGia = '';
+    //     _searchMaDocGiaController.clear();
+    //     _hoTenDocGia = '';
 
-        setState(() {
-          _isProcessingMaDocGia = false;
-        });
-        return;
-      }
-      _maDocGia = maDocGia.toString();
+    //     setState(() {
+    //       _isProcessingMaDocGia = false;
+    //     });
+    //     return;
+    //   }
+    //   _maDocGia = maDocGia.toString();
 
-      _soSachDangMuon =
-          (await dbProcess.querySoSachDangMuonCuaDocGia(maDocGia)).toString();
+    //   _soSachDangMuon =
+    //       (await dbProcess.querySoSachDangMuonCuaDocGia(maDocGia)).toString();
 
-      int soSachQuaHan =
-          await dbProcess.querySoSachMuonQuahanCuaDocGia(maDocGia);
+    //   int soSachQuaHan =
+    //       await dbProcess.querySoSachMuonQuahanCuaDocGia(maDocGia);
 
-      if (soSachQuaHan > 0 && mounted) {
-        showDialog(
-          context: context,
-          builder: (ctx) => Dialog(
-            surfaceTintColor: Colors.transparent,
-            child: SizedBox(
-              width: 300,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.warning_rounded,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 52,
-                    ),
-                    const Gap(10),
-                    const Text(
-                      'Lưu ý',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    const Gap(4),
-                    Text(
-                      'Độc giả $_hoTenDocGia có \n $soSachQuaHan cuốn sách quá hạn',
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const Gap(16),
-                    FilledButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Đóng'),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-    }
+    //   if (soSachQuaHan > 0 && mounted) {
+    //     showDialog(
+    //       context: context,
+    //       builder: (ctx) => Dialog(
+    //         surfaceTintColor: Colors.transparent,
+    //         child: SizedBox(
+    //           width: 300,
+    //           child: Padding(
+    //             padding: const EdgeInsets.all(20),
+    //             child: Column(
+    //               mainAxisSize: MainAxisSize.min,
+    //               children: [
+    //                 Icon(
+    //                   Icons.warning_rounded,
+    //                   color: Theme.of(context).colorScheme.primary,
+    //                   size: 52,
+    //                 ),
+    //                 const Gap(10),
+    //                 const Text(
+    //                   'Lưu ý',
+    //                   style: TextStyle(
+    //                     fontSize: 16,
+    //                   ),
+    //                 ),
+    //                 const Gap(4),
+    //                 Text(
+    //                   'Độc giả $_hoTenDocGia có \n $soSachQuaHan cuốn sách quá hạn',
+    //                   style: const TextStyle(
+    //                     fontSize: 16,
+    //                   ),
+    //                   textAlign: TextAlign.center,
+    //                 ),
+    //                 const Gap(16),
+    //                 FilledButton(
+    //                   onPressed: () => Navigator.of(context).pop(),
+    //                   child: const Text('Đóng'),
+    //                 )
+    //               ],
+    //             ),
+    //           ),
+    //         ),
+    //       ),
+    //     );
+    //   }
+    // }
 
-    setState(() {
-      _isProcessingMaDocGia = false;
-    });
-  }
+    // setState(() {
+    //   _isProcessingMaDocGia = false;
+    // });
+    Map<String, dynamic> context = {'maDocGia': _searchMaDocGiaController.text};
 
-  void _savePhieuMuons(List<CuonSachDto2th> cuonSachs) async {
-    /* Kiểm tra mã độc giả đã được nhập đúng đắn chưa */
-    if (_maDocGia.isEmpty) {
-      await _searchMaDocGia();
-      if (_maDocGia.isEmpty) {
-        return;
-      }
-    }
+    // Search Chain
+    ValidateMaDocGiaBaseHandler nullStringValidate =
+        ValidateMDGNullStringHandler();
+    ValidateMaDocGiaBaseHandler existValidate = ValidateMDGExistHandler();
+    ValidateMaDocGiaBaseHandler expireValidate = ValidateMDGExpireDateHandler();
+    nullStringValidate.setNext(existValidate);
+    existValidate.setNext(expireValidate);
 
-    _errorText = '';
-    if (cuonSachs.isEmpty) {
+    await nullStringValidate.handle(context);
+
+    if (context.containsKey('error')) {
       setState(() {
-        _errorText = 'Bạn chưa thêm cuốn sách nào';
+        _errorText = context['error'];
       });
       return;
     }
 
     setState(() {
-      _isProcessingLuuPhieuMuon = true;
+      _maDocGia = context['maDocGia'];
+      _hoTenDocGia = context['hoTenDocGia'];
     });
+  }
 
-    int maDocGia = int.parse(_maDocGia);
+  void _savePhieuMuons(List<CuonSachDto2th> cuonSachs) async {
+    /* Kiểm tra mã độc giả đã được nhập đúng đắn chưa */
+    // if (_maDocGia.isEmpty) {
+    //   await _searchMaDocGia();
+    //   if (_maDocGia.isEmpty) {
+    //     return;
+    //   }
+    // }
 
-    for (var cuonSach in cuonSachs) {
-      DateTime ngayMuon = vnDateFormat.parse(_ngayMuonController.text);
+    // _errorText = '';
+    // if (cuonSachs.isEmpty) {
+    //   setState(() {
+    //     _errorText = 'Bạn chưa thêm cuốn sách nào';
+    //   });
+    //   return;
+    // }
 
-      final phieuMuon = PhieuMuon(
-        null,
-        cuonSach.maCuonSach,
-        maDocGia,
-        ngayMuon,
-        ngayMuon.addDays(ThamSoQuyDinh.soNgayMuonToiDa),
-        'Đang mượn',
-      );
+    // setState(() {
+    //   _isProcessingLuuPhieuMuon = true;
+    // });
 
-      /* Không cần await cũng được */
-      await dbProcess.insertPhieuMuon(phieuMuon);
-      await dbProcess.updateTinhTrangCuonSachWithMaCuonSach(
-          phieuMuon.maCuonSach, 'Đang mượn');
+    // int maDocGia = int.parse(_maDocGia);
+
+    // for (var cuonSach in cuonSachs) {
+    //   DateTime ngayMuon = vnDateFormat.parse(_ngayMuonController.text);
+
+    //   final phieuMuon = PhieuMuon(
+    //     null,
+    //     cuonSach.maCuonSach,
+    //     maDocGia,
+    //     ngayMuon,
+    //     ngayMuon.addDays(ThamSoQuyDinh.soNgayMuonToiDa),
+    //     'Đang mượn',
+    //   );
+
+    //   /* Không cần await cũng được */
+    //   await dbProcess.insertPhieuMuon(phieuMuon);
+    //   await dbProcess.updateTinhTrangCuonSachWithMaCuonSach(
+    //       phieuMuon.maCuonSach, 'Đang mượn');
+    // }
+    // await Future.delayed(const Duration(milliseconds: 200));
+
+    // if (mounted) {
+    //   context.read<SelectedCuonSachChoMuonCubit>().clear();
+
+    //   /* Hiện thị thông báo lưu Phiếu mượn thành công */
+    //   ScaffoldMessenger.of(context).clearSnackBars();
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text(
+    //         'Lưu Phiếu mượn thành công',
+    //         textAlign: TextAlign.center,
+    //       ),
+    //       behavior: SnackBarBehavior.floating,
+    //       duration: Duration(seconds: 3),
+    //       width: 300,
+    //     ),
+    //   );
+    // }
+
+    // if (_isInPhieuMuon) {
+    //   PdfFacade.generateAndOpenPhieuMuon(_ngayMuonController.text,
+    //       _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
+    // }
+
+    // /* Sau khi lưu xong dữ liệu vào DB thì ta reset lại trang */
+    // _searchMaDocGiaController.clear();
+
+    // _searchCuonSachController.clear();
+    // _maCuonSachToAddCuonSachController.clear();
+    // setState(() {
+    //   _maDocGia = '';
+    //   _hoTenDocGia = '';
+    //   _soSachDangMuon = '';
+    // });
+
+    // setState(() {
+    //   _isProcessingLuuPhieuMuon = false;
+    // });
+
+    Map<String, dynamic> saveDataContext = {
+      'maDocGia': _maDocGia,
+      'cuonSachs': cuonSachs,
+      'ngayMuon': _ngayMuonController.text
+    };
+
+    // Save Chain
+    LuuPhieuMuonBaseHandler saveChain = ValidateMDGEmptyHandler();
+    LuuPhieuMuonBaseHandler validateCuonSach = ValidateCuonSachHandler();
+    LuuPhieuMuonBaseHandler saveData = SaveDataHandler();
+    saveChain.setNext(validateCuonSach);
+    validateCuonSach.setNext(saveData);
+
+    await saveChain.handle(saveDataContext);
+
+    if (saveDataContext.containsKey('error')) {
+      setState(() {
+        _errorText = saveDataContext['error'];
+      });
+      return;
     }
-    await Future.delayed(const Duration(milliseconds: 200));
 
-    if (mounted) {
-      context.read<SelectedCuonSachChoMuonCubit>().clear();
-
-      /* Hiện thị thông báo lưu Phiếu mượn thành công */
-      ScaffoldMessenger.of(context).clearSnackBars();
+    setState(() {
+      _errorText = '';
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Lưu Phiếu mượn thành công',
-            textAlign: TextAlign.center,
-          ),
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 3),
-          width: 300,
-        ),
+        const SnackBar(content: Text('Lưu Phiếu Mượn thành công')),
       );
-    }
+    });
 
     if (_isInPhieuMuon) {
       if (_selectedOption == 'Pdf') {
