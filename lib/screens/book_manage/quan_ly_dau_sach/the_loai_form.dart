@@ -18,6 +18,7 @@ class TheLoaiForm extends StatefulWidget {
 class _TheLoaiFormState extends State<TheLoaiForm> {
   late final List<TheLoai> _theLoais;
   late List<TheLoai> _filteredTheLoais;
+  final template = TheLoai.creatNewTemplate();
 
   late final Future<void> _futureTacGias = _getTacGias();
   Future<void> _getTacGias() async {
@@ -95,7 +96,7 @@ class _TheLoaiFormState extends State<TheLoaiForm> {
                         _themTheLoaiController.text,
                       );
                       int returningId =
-                          await dbProcess.insertTheLoai(newTheLoai);
+                          await dbProcess.insertTheLoai(newTheLoai.tenTheLoai);
                       newTheLoai.maTheLoai = returningId;
 
                       /* Cập nhật lại danh sách Tác Giả */

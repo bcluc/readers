@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:readers/components/label_text_form_field.dart';
-import 'package:readers/cubit/tat_ca_sach_cubit.dart';
+import 'package:readers/features/sach_management/cubit/sach_management_cubit.dart';
 import 'package:readers/models/chi_tiet_phieu_nhap.dart';
+import 'package:readers/models/sach.dart';
 import 'package:readers/screens/book_manage/nhap_sach/tat_ca_sach.dart';
 import 'package:readers/screens/book_manage/nhap_sach/them_sach_moi_form.dart';
 import 'package:readers/utils/extension.dart';
@@ -58,14 +59,21 @@ class _AddEditEnterBookDetailState extends State<AddEditEnterBookDetailForm> {
   @override
   void initState() {
     super.initState();
-    /*
-    Nếu là chỉnh sửa Chi Tiết Nhập Sách
-    thì phải fill thông tin vào của Chi Tiết Nhập Sách cần chỉnh sửa vào form
-    */
     if (widget.editChiTietNhapSach != null) {
       _maSachController.text = widget.editChiTietNhapSach!.maSach.toString();
       _soLuongController.text = widget.editChiTietNhapSach!.soLuong.toString();
       _donGiaController.text = widget.editChiTietNhapSach!.donGia.toString();
+    }
+  }
+
+  Future<bool> handleContain(int maSach) async {
+    List<Sach> sachs = context.read<SachManagementCubit>().state.sachs!;
+    await context.read<SachManagementCubit>().contains(maSach, sachs);
+    if (mounted) {
+      // ignore: use_build_context_synchronously
+      return context.read<SachManagementCubit>().state.isContains;
+    } else {
+      return false;
     }
   }
 
@@ -105,8 +113,8 @@ class _AddEditEnterBookDetailState extends State<AddEditEnterBookDetailForm> {
               //   height: 20,
               // ),
               /*
-                Thêm Sách mới
-                */
+                    Thêm Sách mới
+                    */
               Positioned(
                 right: 0,
                 child: IgnorePointer(
@@ -183,9 +191,7 @@ class _AddEditEnterBookDetailState extends State<AddEditEnterBookDetailForm> {
                                   return 'Mã Sách phải là con số';
                                 }
 
-                                if (!context
-                                    .read<TatCaSachCubit>()
-                                    .contains(maSach)) {
+                                if (handleContain(maSach) == false) {
                                   return 'Mã Sách không tồn tại';
                                 }
 

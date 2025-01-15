@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:readers/dto/chi_tiet_phieu_nhap_dto.dart';
-import 'package:readers/dto/cuon_sach_dto.dart';
+import 'package:readers/features/sach_management/dtos/cuon_sach_dto.dart';
 import 'package:readers/dto/cuon_sach_dto_2th.dart';
 import 'package:readers/dto/dau_sach_dto.dart';
 import 'package:readers/dto/phieu_muon_can_tra_dto.dart';
 import 'package:readers/dto/phieu_muon_dto.dart';
-import 'package:readers/dto/tac_gia_dto.dart';
-import 'package:readers/dto/the_loai_dto.dart';
+import 'package:readers/features/tac_gia_management/dtos/tac_gia_dto.dart';
+import 'package:readers/features/the_loai_management/dtos/the_loai_dto.dart';
 import 'package:readers/models/chi_tiet_phieu_nhap.dart';
 import 'package:readers/models/dau_sach.dart';
 import 'package:readers/models/doc_gia.dart';
@@ -22,8 +22,9 @@ import 'package:readers/models/report_thu_nhap.dart';
 import 'package:readers/models/sach.dart';
 import 'package:readers/models/tac_gia.dart';
 import 'package:readers/models/the_loai.dart';
-import 'package:readers/utils/common_variables.dart';
 import 'package:readers/utils/extension.dart';
+import 'package:readers/utils/common_variables.dart';
+import 'package:readers/utils/parameters.dart';
 import 'package:sqflite/utils/utils.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -345,7 +346,13 @@ class DbProcess {
   }
 
   Future<int> insertDocGia(DocGia newDocGia) async {
-    return await _database.insert('DocGia', newDocGia.toMap());
+    int maDocGia = await _database.insert('DocGia', newDocGia.toMap());
+    await _database.insert('CT_TaoThe', {
+      'MaDocGia': maDocGia,
+      'PhiTaoThe': ThamSoQuyDinh.phiTaoThe,
+      'NgayTao': DateTime.now().toVnFormat(),
+    });
+    return maDocGia;
   }
 
   Future<void> deleteDocGia(int maDocGia) async {
@@ -904,11 +911,11 @@ class DbProcess {
     return tacGias;
   }
 
-  Future<int> insertTacGia(TacGia newTacGia) async {
+  Future<int> insertTacGia(String tenTacGia) async {
     return await _database.insert(
       'TacGia',
       {
-        'TenTacGia': newTacGia.tenTacGia,
+        'TenTacGia': tenTacGia,
       },
     );
   }
@@ -1005,11 +1012,11 @@ class DbProcess {
     return theLoais;
   }
 
-  Future<int> insertTheLoai(TheLoai newTheLoai) async {
+  Future<int> insertTheLoai(String tenTheLoai) async {
     return await _database.insert(
       'TheLoai',
       {
-        'TenTheLoai': newTheLoai.tenTheLoai,
+        'TenTheLoai': tenTheLoai,
       },
     );
   }
@@ -1250,7 +1257,7 @@ class DbProcess {
     return cuonSach;
   }
 
-  Future<void> updateViTriCuonSach(CuonSachDto updatedCuonSachDto) async {
+  Future<void> updateViTriCuonSach(String viTri, String maCuonSach) async {
     await _database.rawUpdate(
       '''
       update CuonSach
@@ -1258,8 +1265,8 @@ class DbProcess {
       where MaCuonSach = ?
       ''',
       [
-        updatedCuonSachDto.viTri,
-        updatedCuonSachDto.maCuonSach,
+        viTri,
+        maCuonSach,
       ],
     );
   }

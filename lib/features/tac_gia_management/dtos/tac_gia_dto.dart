@@ -1,5 +1,5 @@
 class TacGiaDto {
-  int maTacGia;
+  int? maTacGia;
   String tenTacGia;
   int soLuongSach;
 

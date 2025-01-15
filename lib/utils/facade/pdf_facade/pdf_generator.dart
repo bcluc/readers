@@ -1,23 +1,12 @@
-import 'dart:io';
-
 import 'package:flutter/services.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart';
+import 'package:readers/dto/cuon_sach_dto_2th.dart';
 import 'package:readers/utils/extension.dart';
 import 'package:readers/utils/parameters.dart';
-import 'package:pdf/pdf.dart';
-/* 
-Lưu ý:
-Các Widget thường thấy như Container, Text, ... là của thư viện "pdf/widgets.dart"
-Không phải của "flutter/material.dart"
-*/
-import 'package:pdf/widgets.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart';
 
-import 'package:readers/dto/cuon_sach_dto_2th.dart';
-import 'package:printing/printing.dart';
-
-class PdfApi {
+class PdfGenerator {
   static Future<Document> generatePhieuMuon({
     required String ngayMuon,
     required String hanTra,
@@ -27,9 +16,12 @@ class PdfApi {
   }) async {
     final pdf = Document();
 
-    final nunitoRegularFont = await PdfGoogleFonts.nunitoRegular();
-    final nunitoBoldFont = await PdfGoogleFonts.nunitoBold();
-    final nunitoItalicFont = await PdfGoogleFonts.nunitoItalic();
+    final nunitoRegularFont =
+        pw.Font.ttf(await rootBundle.load('assets/fonts/Roboto-Regular.ttf'));
+    final nunitoBoldFont =
+        pw.Font.ttf(await rootBundle.load('assets/fonts/Roboto-Bold.ttf'));
+    final nunitoItalicFont =
+        pw.Font.ttf(await rootBundle.load('assets/fonts/Roboto-Italic.ttf'));
 
     final nunitoRegularTextStyle = pw.TextStyle(font: nunitoRegularFont);
     // final nunitoBoldTextStyle = pw.TextStyle(font: nunitoBoldFont);
@@ -255,34 +247,5 @@ class PdfApi {
     );
 
     return pdf;
-  }
-
-  static Future<File> saveDocument({
-    required String name,
-    required Document pdfDoc,
-  }) async {
-    final bytes = await pdfDoc.save();
-
-    final dir = await getApplicationDocumentsDirectory();
-
-    final folderPath = '${dir.path}/ReaderLM Document';
-
-    // Kiểm tra xem thư mục có tồn tại hay không
-    if (!await Directory(folderPath).exists()) {
-      // Nếu không tồn tại, tạo thư mục
-      await Directory(folderPath).create();
-    }
-
-    final file = File('${dir.path}/ReaderLM Document/$name.pdf');
-
-    await file.writeAsBytes(bytes);
-
-    return file;
-  }
-
-  static Future<void> openFile(File file) async {
-    final url = file.path;
-
-    await OpenFile.open(url);
   }
 }

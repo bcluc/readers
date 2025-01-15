@@ -389,9 +389,9 @@ class _ReaderManageState extends State<ReaderManage> {
                               ),
                               DataCell(
                                 /* 
-                                Ràng buộc cho Chiều rộng Tối đa của cột Địa chỉ = 250 
-                                phòng trường hợp địa chỉ quá dài
-                                */
+                          Ràng buộc cho Chiều rộng Tối đa của cột Địa chỉ = 250 
+                          phòng trường hợp địa chỉ quá dài
+                          */
                                 ConstrainedBox(
                                   constraints:
                                       const BoxConstraints(maxWidth: 250),

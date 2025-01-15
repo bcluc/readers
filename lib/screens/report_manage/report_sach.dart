@@ -6,6 +6,8 @@ import 'package:readers/models/report_sach.dart';
 import 'package:readers/models/report_the_loai_muon.dart';
 import 'package:readers/screens/report_manage/report_sach_chitiet.dart';
 import 'package:readers/screens/report_manage/report_sach_muon_the_loai.dart';
+import 'package:readers/utils/facade/chart_facade/bar_chart_facade.dart';
+import 'package:readers/utils/facade/chart_facade/chart_axis_facade.dart';
 
 class BaoCaoSach extends StatefulWidget {
   const BaoCaoSach({required this.selectedYear, super.key});
@@ -18,7 +20,6 @@ class _BaoCaoSachState extends State<BaoCaoSach> {
   int _highestNum = 0;
   int _totalBookBorrow = 0;
   int _totalBookImport = 0;
-  final double _width = 35;
   late List<TKSach> _bookBorrow;
   late List<TKSach> _bookImport;
   late List<TKTheLoai> _bookCategory;
@@ -78,6 +79,18 @@ class _BaoCaoSachState extends State<BaoCaoSach> {
               child: CircularProgressIndicator(),
             );
           }
+          final bookBorrowList =
+              _reportSachMuonInYear(_bookBorrow, widget.selectedYear);
+          final bookImportList =
+              _reportSachNhapInYear(_bookImport, widget.selectedYear);
+          final barChartFacade = BarChartFacade(
+            highestNum: _highestNum,
+            mainColor: const Color.fromARGB(255, 4, 104, 138),
+            thirdColor: const Color.fromARGB(255, 72, 184, 233),
+            width: 35,
+          );
+
+          final chartAxisFacade = ChartAxisFacade();
           return Padding(
             padding: const EdgeInsets.fromLTRB(50, 10, 70, 60),
             child: Column(
@@ -111,9 +124,10 @@ class _BaoCaoSachState extends State<BaoCaoSach> {
                         height: 24,
                         //color: mainColor,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: mainColor),
-                            color: mainColor),
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: mainColor),
+                          color: barChartFacade.mainColor,
+                        ),
                       ),
                       const SizedBox(
                         width: 30,
@@ -136,7 +150,7 @@ class _BaoCaoSachState extends State<BaoCaoSach> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
                             border: Border.all(color: thirdColor),
-                            color: thirdColor),
+                            color: barChartFacade.thirdColor),
                       ),
                     ],
                   ),
@@ -144,7 +158,27 @@ class _BaoCaoSachState extends State<BaoCaoSach> {
                 const SizedBox(
                   height: 30,
                 ),
-                Expanded(child: BarChart(_mainBarData())),
+                Expanded(
+                  child: BarChart(
+                    barChartFacade.generateChartData(
+                      bookBorrowList: bookBorrowList,
+                      bookImportList: bookImportList,
+                      titlesData: chartAxisFacade.buildAxis(
+                        _highestNum - _highestNum % 10 + 10,
+                        "CUỐN SÁCH",
+                      ),
+                      onBarTap: (month, barIndex) {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => BaoCaoSachChiTiet(
+                            barIndex: barIndex,
+                            list: _bookListInMonth(month, barIndex),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
                 const SizedBox(
                   height: 10,
                 ),
@@ -214,142 +248,6 @@ class _BaoCaoSachState extends State<BaoCaoSach> {
         });
   }
 
-  BarChartData _mainBarData() {
-    int topValue = _highestNum - _highestNum % 10 + 10;
-    return BarChartData(
-        minY: 0,
-        maxY: topValue.toDouble(),
-        titlesData: _buildAxes(),
-        barTouchData: BarTouchData(
-          enabled: true,
-          touchTooltipData: BarTouchTooltipData(),
-          touchCallback: (p0, p1) {
-            if (p0 is FlTapUpEvent) {
-              if (p1 == null) return;
-              if (p1.spot?.touchedBarGroupIndex == null) return;
-              if (p1.spot?.touchedRodDataIndex == null) return;
-              showDialog(
-                context: context,
-                builder: (ctx) => BaoCaoSachChiTiet(
-                  barIndex: p1.spot!.touchedRodDataIndex,
-                  list: _bookListInMoth(p1.spot!.touchedBarGroupIndex,
-                      p1.spot!.touchedRodDataIndex),
-                ),
-              );
-            }
-          },
-        ),
-        gridData: const FlGridData(show: false),
-        borderData: FlBorderData(
-            border: const Border(
-                bottom: BorderSide(width: 1), left: BorderSide(width: 1))),
-        barGroups: _buildAllBars());
-  }
-
-  // tạo các mục dưới bảng
-  SideTitles get _bottomTitles => SideTitles(
-        showTitles: true,
-        interval: 1,
-        getTitlesWidget: (value, meta) {
-          String text = '';
-          switch (value.toInt()) {
-            case 1:
-              text = 'Th1';
-              break;
-            case 2:
-              text = 'Th2';
-              break;
-            case 3:
-              text = 'Th3';
-              break;
-            case 4:
-              text = 'Th4';
-              break;
-            case 5:
-              text = 'Th5';
-              break;
-            case 6:
-              text = 'Th6';
-              break;
-            case 7:
-              text = 'Th7';
-              break;
-            case 8:
-              text = 'Th8';
-              break;
-            case 9:
-              text = 'Th9';
-              break;
-            case 10:
-              text = 'Th10';
-              break;
-            case 11:
-              text = 'Th11';
-              break;
-            case 12:
-              text = 'Th12';
-              break;
-          }
-
-          return Text(text);
-        },
-      );
-
-// Tạo title cho khung
-  FlTitlesData _buildAxes() {
-    int topValue = _highestNum - _highestNum % 10 + 10;
-
-    return FlTitlesData(
-        show: true,
-        // Build X axis.
-        bottomTitles: AxisTitles(sideTitles: _bottomTitles),
-        leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              getTitlesWidget: defaultGetTitle,
-              reservedSize: 30,
-              interval: (topValue / 5).toDouble(),
-            ),
-            axisNameWidget: const Text('CUỐN SÁCH')),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)));
-  }
-
-  // Tạo cả 2 biểu đồ sách mượn và sách nhập
-  List<BarChartGroupData> _buildAllBars() {
-    final List<int> bookBorrowList =
-        _reportSachMuonInYear(_bookBorrow, widget.selectedYear);
-    final List<int> bookImportList =
-        _reportSachNhapInYear(_bookImport, widget.selectedYear);
-    return List.generate(
-      bookBorrowList.length, // y1                 // y2
-      (index) => _buildBar(index, bookBorrowList[index].toDouble(),
-          bookImportList[index].toDouble()),
-    );
-  }
-
-  // Function to define how to bar would look like.
-  BarChartGroupData _buildBar(int x, double y1, double y2) {
-    return BarChartGroupData(
-      barsSpace: 5,
-      x: x + 1,
-      barRods: [
-        BarChartRodData(
-            toY: y1,
-            color: mainColor,
-            width: _width,
-            borderRadius: BorderRadius.circular(3)),
-        BarChartRodData(
-            toY: y2,
-            color: thirdColor,
-            width: _width,
-            borderRadius: BorderRadius.circular(3)),
-      ],
-    );
-  }
-
   // Danh sách chi tiết các sách mượn trong tháng
   List<TKSach> _bookBorrowListInMonth(int month) {
     List<TKSach> list = List.empty(growable: true);
@@ -373,7 +271,7 @@ class _BaoCaoSachState extends State<BaoCaoSach> {
   }
 
   // Trả về danh sách loại sách trong tháng
-  List<TKSach> _bookListInMoth(int month, int barIndex) {
+  List<TKSach> _bookListInMonth(int month, int barIndex) {
     List<TKSach> list = List.empty(growable: true);
     if (barIndex == 0) {
       list = _bookBorrowListInMonth(month);
