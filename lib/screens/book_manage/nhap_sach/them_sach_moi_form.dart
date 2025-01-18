@@ -45,6 +45,7 @@ class _ThemSachMoiFormState extends State<ThemSachMoiForm> {
   final _timTenDauSachController = TextEditingController();
   final _lanTaiBanController = TextEditingController();
   final _nhaXuatBanController = TextEditingController();
+  final _tenDauSachController = TextEditingController();
 
   //
   void _saveSachMoi() async {
@@ -64,13 +65,33 @@ class _ThemSachMoiFormState extends State<ThemSachMoiForm> {
         _filteredDauSachs[_selectedIndex].maDauSach!,
         _filteredDauSachs[_selectedIndex].tenDauSach,
       );
-      // int maSachMoi = await dbProcess.insertSach(newSach);
-      // newSach.maSach = maSachMoi;
 
-      // print('(${newSach.maDauSach}, ${newSach.maSach}, ${newSach.lanTaiBan}, ${newSach.nhaXuatBan})');
       setState(() {
         context.read<SachManagementCubit>().addSach(newSach);
+        _selectedIndex = -2;
+        _lanTaiBanController.clear();
+        _nhaXuatBanController.clear();
+      });
+    }
+  }
 
+  void _saveDauSachMoi() async {
+    setState(() {
+      if (_selectedIndex == -2) {
+        _selectedIndex = -1;
+      }
+    });
+
+    bool isValid = _formKey.currentState!.validate();
+
+    if (isValid) {
+      DauSach newDauSach = DauSach(
+        null,
+        _tenDauSachController.text,
+      );
+
+      setState(() {
+        _dauSachs.insert(0, newDauSach);
         _selectedIndex = -2;
         _lanTaiBanController.clear();
         _nhaXuatBanController.clear();
@@ -157,6 +178,7 @@ class _ThemSachMoiFormState extends State<ThemSachMoiForm> {
                             onTap: () {
                               /* Lấy vị trí của InkWell Widget đã được render trên màn hình
                               để show menu đúng vị trị đó */
+                              _saveDauSachMoi();
                               RenderObject? renderObject = _chonDauSachKey
                                   .currentContext!
                                   .findRenderObject();

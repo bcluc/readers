@@ -10,6 +10,30 @@ class SachManagementCubit extends Cubit<SachManagementState> {
   SachManagementCubit(this.sachManagementRepository)
       : super(SachManagementState());
 
+  Future<void> addSach(Sach newSach) async {
+    emit(
+      state.copyWith(
+        isLoading: true,
+        errorMessage: "",
+      ),
+    );
+    final result = await sachManagementRepository.addSach(newSach);
+    return (switch (result) {
+      Success() => emit(
+          state.copyWith(
+            isLoading: false,
+            sachs: [...?state.sachs, result.data],
+          ),
+        ),
+      Failure() => emit(
+          state.copyWith(
+            isLoading: false,
+            errorMessage: result.message,
+          ),
+        ),
+    });
+  }
+
   Future<void> getSachList() async {
     emit(
       state.copyWith(
@@ -34,19 +58,19 @@ class SachManagementCubit extends Cubit<SachManagementState> {
     });
   }
 
-  Future<void> addSach(Sach newSach) async {
+  Future<void> getTenDauSach(int maSach, List<Sach> sachs) async {
     emit(
       state.copyWith(
         isLoading: true,
         errorMessage: "",
       ),
     );
-    final result = await sachManagementRepository.addSach(newSach);
+    final result = await sachManagementRepository.getTenDauSach(maSach, sachs);
     return (switch (result) {
       Success() => emit(
           state.copyWith(
             isLoading: false,
-            sachs: [...?state.sachs, result.data],
+            tenDauSach: result.data,
           ),
         ),
       Failure() => emit(
@@ -78,30 +102,6 @@ class SachManagementCubit extends Cubit<SachManagementState> {
             isLoading: false,
             errorMessage: result.message,
             isContains: false,
-          ),
-        ),
-    });
-  }
-
-  Future<void> getTenDauSach(int maSach, List<Sach> sachs) async {
-    emit(
-      state.copyWith(
-        isLoading: true,
-        errorMessage: "",
-      ),
-    );
-    final result = await sachManagementRepository.getTenDauSach(maSach, sachs);
-    return (switch (result) {
-      Success() => emit(
-          state.copyWith(
-            isLoading: false,
-            tenDauSach: result.data,
-          ),
-        ),
-      Failure() => emit(
-          state.copyWith(
-            isLoading: false,
-            errorMessage: result.message,
           ),
         ),
     });

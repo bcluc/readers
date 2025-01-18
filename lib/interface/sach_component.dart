@@ -1,4 +1,3 @@
-abstract class SachComponent {
-  void create();
-  void update();
+abstract interface class SachComponent {
+  bool contain(int maSach);
 }

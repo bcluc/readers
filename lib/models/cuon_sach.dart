@@ -1,8 +1,6 @@
-import 'package:readers/interface/sach_component.dart';
-
 import 'observers/book_status_observer.dart';
 
-class CuonSach implements SachComponent {
+class CuonSach {
   int? maCuonSach;
   String tinhTrang;
   String viTri;
@@ -42,15 +40,5 @@ class CuonSach implements SachComponent {
         newViTri,
       );
     }
-  }
-
-  @override
-  void create() {
-    // TODO: implement create
-  }
-
-  @override
-  void update() {
-    // TODO: implement update
   }
 }
