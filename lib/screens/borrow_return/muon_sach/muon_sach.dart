@@ -11,12 +11,14 @@ import 'package:readers/screens/borrow_return/muon_sach/sach_da_chon.dart';
 import 'package:readers/screens/borrow_return/muon_sach/sach_trong_kho.dart';
 import 'package:readers/utils/CoR/save_data_handler.dart';
 import 'package:readers/utils/CoR/save_phieu_muon_base_handler.dart';
+import 'package:readers/utils/CoR/validate_borrowing_books_return_date_handler.dart';
 import 'package:readers/utils/CoR/validate_cuon_sach_handler.dart';
 import 'package:readers/utils/CoR/validate_expire_date_handler.dart';
 import 'package:readers/utils/CoR/validate_ma_doc_gia_base_handler.dart';
 import 'package:readers/utils/CoR/validate_ma_doc_gia_empty_handler.dart';
 import 'package:readers/utils/CoR/validate_mdg_exist_handler.dart';
 import 'package:readers/utils/CoR/validate_mdg_null_string_handler.dart';
+import 'package:readers/utils/CoR/validate_num_of_books_borrowing_handler.dart';
 import 'package:readers/utils/Export_file_strategy/export_file_excel_strategy.dart';
 import 'package:readers/utils/Export_file_strategy/export_file_pdf_strategy.dart';
 import 'package:readers/utils/Export_file_strategy/export_file_strategy.dart';
@@ -206,14 +208,15 @@ class _MuonSachState extends State<MuonSach> {
     Map<String, dynamic> context = {'maDocGia': _searchMaDocGiaController.text};
 
     // Search Chain
-    ValidateMaDocGiaBaseHandler nullStringValidate =
-        ValidateMDGNullStringHandler();
-    ValidateMaDocGiaBaseHandler existValidate = ValidateMDGExistHandler();
     ValidateMaDocGiaBaseHandler expireValidate = ValidateMDGExpireDateHandler();
-    nullStringValidate.setNext(existValidate);
-    existValidate.setNext(expireValidate);
+    ValidateMaDocGiaBaseHandler numOfBooksValidate =
+        ValidateNumOfBooksBorrowingHandler();
+    ValidateMaDocGiaBaseHandler overdueBooksValidate =
+        ValidateBorrowingBooksReturnDateHandler();
 
-    await nullStringValidate.handle(context);
+    expireValidate.setNext(numOfBooksValidate);
+    numOfBooksValidate.setNext(overdueBooksValidate);
+    await expireValidate.handle(context);
 
     if (context.containsKey('error')) {
       setState(() {
@@ -339,7 +342,7 @@ class _MuonSachState extends State<MuonSach> {
 
     if (_isInPhieuMuon) {
       if (_selectedOption == 'Pdf') {
-        _exportFileStrategy = ExportFilePdfStrategy(PdfFacade());
+        _exportFileStrategy = ExportFilePdfStrategy();
         _exportFileStrategy.XuatPhieuMuon(_ngayMuonController.text,
             _hanTraController.text, _maDocGia, _hoTenDocGia, cuonSachs);
       } else {
